@@ -7,18 +7,23 @@ clear all
 %mfccs = real(fsMfccsSet);
 % %matriceDN = [matriceDN featuresSet];
 
-load("matriceDN.mat");
+load("./templatesDN/matriceDN.mat");
 %data = real(data);
 
 %we need to delete some audio
 data = real(data(1:1430,:));
-n = size(data,1);
+% n = size(data,1);
+
+labelsDN = labels(:, 1:1430);
+% labelsDN = labels;
 
 %labels matrix
-load("training_labelsDN.mat")
-load("testing_labelsDN.mat");
-labelsDN = labels;
-labelsDN = [labelsDN; labels1];
+% load("training_labelsDN.mat")
+% load("testing_labelsDN.mat");
+% labelsDN = labels;
+% labelsDN = [labelsDN; labels1];
+
+
 
 %name of features
 nomefs{1} = 'SpectralCentroid';

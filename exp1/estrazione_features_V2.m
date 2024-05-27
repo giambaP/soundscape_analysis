@@ -19,20 +19,21 @@ featuresCount = length(nomefs);
 
 nomeexp = './templatesYAT/PrimoExp';
 
-% generating mat per feature
+
+% parallel generation of mat per feature
 for fs=1:featuresCount
     featureName = nomefs{fs};
-    fprintf('Creating feature %s \n', featureName);
+    fprintf('%2d. %s: starting \n', fs, featureName);
 
-    templateName = sprintf("%s_%s.mat", nomeexp, featureName);
-    if ~exist(templateName, "file")
+    featureFilePath = sprintf("%s_%s.mat", nomeexp, featureName);
+    if ~exist(featureFilePath, "file")
+        featuresSet = [];
+        labels = [];
+
         counterRow = 1;
 
-        clear featuresSet
-        clear labels
-
         for YAT = 1:3
-            fprintf('Extracting YAT %d\n',YAT);
+            fprintf('%2d. %s, YAT %d: starting  \n', fs, featureName, YAT);
             %audio per days
             for i = 1:numOfDays
                 %audio per hours
@@ -49,7 +50,7 @@ for fs=1:featuresCount
                     else
                         nm = strcat(nm,'_',num2str(j),'0000.WAV');
                     end
-                    fprintf('%d) %s\n', counterRow, nm);
+                    % fprintf('%d) %s\n', counterRow, nm);
 
                     audioName = strcat('./databaseYAT/YAT', num2str(YAT),'Audible/',nm);
                     if exist(audioName, "file")
@@ -60,7 +61,8 @@ for fs=1:featuresCount
 
                         [y, f_s] = audioread(audioName);
                         [X, f, t] = ComputeSpectrogram(y, f_s, [], iBlockLength, iHopLength);
-
+                        
+                        fsval = [];
                         switch fs
                             case 1
                                 fsval = FeatureSpectralCentroid(X, f_s);
@@ -84,22 +86,21 @@ for fs=1:featuresCount
                                 fsval = FeatureTimeAcfCoeff(y, iBlockLength, iHopLength, f_s);
                             case 11
                                 fsval = FeatureTimeMaxAcf(y, iBlockLength, iHopLength, f_s);
-                            case 12
-                                fsMfcc = FeatureSpectralMfccs(X, f_s);
                         end
-                        if(fs ~= 12)
-                            featuresSet(counterRow,:) = fsval;
-                        else
-                            MfccsSet = [MfccsSet fsMfcc];
-                        end
+                        featuresSet(counterRow,:) = fsval;
+                        
                         counterRow = counterRow + 1;
                     end
                 end
             end
+            fprintf('%2d. %s, YAT %d: ended  \n', fs, featureName, YAT);
         end
-        save(sname,'featuresSet','labels');
+        save(featureFilePath,'featuresSet','labels');
     end
 end
+
+elapsed = toc;
+fprintf('Exec time in %.0f sec\n', elapsed);
 
 data = [];
 % concating all feature horizontally
@@ -110,50 +111,50 @@ for fs=1:featuresCount
     featureName = nomefs{fs};
     fprintf('Creating feature %s \n', featureName);
 
-    templateName = sprintf("%s_%s.mat", nomeexp, featureName);
-    if ~exist(templateName, "file")
+    featureFilePath = sprintf("%s_%s.mat", nomeexp, featureName);
+    if ~exist(featureFilePath, "file")
         error("feature file not exist: feature '%s'\n", featureName);
     end
-    load(templateName);
+    load(featureFilePath);
 
     data = [data featuresSet];
     save('./templatesYAT/matriceYAT.mat', 'data', 'labels');
 end
 
-%% checking compatibility
-disp("");
-disp("-----  CHECKING COMPATIBILITY ----");
-dirTemplateNew = "./templatesYAT";
-dirTemplateOriginal = "./templatesYAT_ORIG";
-fileList = dir(dirTemplateOriginal);
-fileList = fileList(~[fileList.isdir]);
-for i=1:length(fileList)
-    fileName = fileList(i, :).name;
-    fprintf("%d. checking file %s\n", i, fileName);
-
-    origFilePath = sprintf("%s/%s", dirTemplateOriginal, fileName);
-    newFilePath = sprintf("%s/%s", dirTemplateNew, fileName);
-    if ~exist(newFilePath , "file")
-        error("feature file not exist final path: feature '%s'\n", featureName);
-    else
-        data1 = load(origFilePath);
-        data2 = load(newFilePath);
-
-        fields1 = fieldnames(data1);
-        fields2 = fieldnames(data2);
-
-        if ~isequal(fields1, fields2)
-            error("feature content files are different: file '%s', field '%s'", fileName, fields1);
-        else
-            isEqual = true;
-            for j = 1:length(fields1)
-                d1 = data1.(fields1{j});
-                d2 = data2.(fields2{j});
-                if ~isequal(d1, d2)
-                    error("feature content fields are different: file '%s', field '%s', posJ:'%d'", ...
-                        fileName, fields1{j}, j);
-                end
-            end
-        end
-    end
-end
+% %% checking compatibility
+% disp("");
+% disp("-----  CHECKING COMPATIBILITY ----");
+% dirTemplateNew = "./templatesYAT";
+% dirTemplateOriginal = "./templatesYAT_ORIG";
+% fileList = dir(dirTemplateOriginal);
+% fileList = fileList(~[fileList.isdir]);
+% for i=1:length(fileList)
+%     fileName = fileList(i, :).name;
+%     fprintf("%d. checking file %s\n", i, fileName);
+% 
+%     origFilePath = sprintf("%s/%s", dirTemplateOriginal, fileName);
+%     newFilePath = sprintf("%s/%s", dirTemplateNew, fileName);
+%     if ~exist(newFilePath , "file")
+%         error("feature file not exist final path: feature '%s'\n", fileName);
+%     else
+%         data1 = load(origFilePath);
+%         data2 = load(newFilePath);
+% 
+%         fields1 = fieldnames(data1);
+%         fields2 = fieldnames(data2);
+% 
+%         if ~isequal(fields1, fields2)
+%             error("feature content files are different: file '%s', field '%s'", fileName, fields1);
+%         else
+%             isEqual = true;
+%             for j = 1:length(fields1)
+%                 d1 = data1.(fields1{j});
+%                 d2 = data2.(fields2{j});
+%                 if ~isequal(d1, d2)
+%                     error("feature content fields are different: file '%s', field '%s', posJ:'%d'", ...
+%                         fileName, fields1{j}, j);
+%                 end
+%             end
+%         end
+%     end
+% end

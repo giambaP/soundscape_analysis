@@ -55,10 +55,11 @@ for fs = fss
                         labels(counterRow) = YAT;
                         %load the audio
 
+                        
+                        [y, f_s] = audioread(audioName);
                         iBlockLength = 4096 * 8;
                         iHopLength = 2048 * 8;
 
-                        [y, f_s] = audioread(audioName);
                         [X, f, t] = ComputeSpectrogram(y, f_s, [], iBlockLength, iHopLength);
 
                         switch fs

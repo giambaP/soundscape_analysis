@@ -8,14 +8,14 @@
 %@retval err: LOO error
 % ======================================================================
 function [err] = LOONNErr(data, features, labels, st)
-    n = size(data,1);
-    
+n = size(data,1);
+
 if (st == 1)
     % STANDARDIZATION
     % remove col with identical values
     xdata = data(:,features);
     a = std(xdata);
-    keep = find(a>0);
+    keep = a > 0;
     xdata = xdata(:,keep);
     % z-score standardization
     newData = zscore(xdata);
@@ -25,7 +25,7 @@ if (st == 1)
 else
     dist = squareform(pdist(data(:,features))); % compute pairwise distance
     dist = dist+eye(size(data,1)).*max(dist(:));
-    
+
 end
 [~,idx] = min(dist,[],2);
 assignedLabels = labels(idx);

@@ -2,7 +2,7 @@ resources/
 downloadAllAudible/datasetAll/YAT1Audible/
 downloadAllAudible/datasetAll/YAT2Audible/
 downloadAllAudible/datasetAll/YAT3Audible/
-exp*/databaseYAT/
-exp*/databaseDN/
-exp*/templatesYAT/
-exp*/templatesDN/
+exp*/spectrogram
+exp*/templates*
+exp*/database*
+exp*/TEST*

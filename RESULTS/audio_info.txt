@@ -1,0 +1,24 @@
+>> YAT 1 start  
+>> YAT 1, MONTH 3 start 
+>> YAT 1, MONTH 3 end, 1483 files in 0.2612 s, 5678.3156 files/s 
+>> YAT 1, MONTH 4 start 
+>> YAT 1, MONTH 4 end, 1440 files in 0.2398 s, 6005.5551 files/s 
+>> YAT 1, MONTH 5 start 
+>> YAT 1, MONTH 5 end, 96 files in 0.3565 s, 269.3164 files/s 
+>> YAT 1 end, 3019 files in 0.3566 s, 8465.2613 files/s 
+>> YAT 2 start  
+>> YAT 2, MONTH 3 start 
+>> YAT 2, MONTH 3 end, 1482 files in 0.2347 s, 6314.4978 files/s 
+>> YAT 2, MONTH 4 start 
+>> YAT 2, MONTH 4 end, 1440 files in 0.2311 s, 6230.7992 files/s 
+>> YAT 2, MONTH 5 start 
+>> YAT 2, MONTH 5 end, 96 files in 0.3491 s, 275.0236 files/s 
+>> YAT 2 end, 3018 files in 0.3493 s, 8639.7169 files/s 
+>> YAT 3 start  
+>> YAT 3, MONTH 3 start 
+>> YAT 3, MONTH 3 end, 1482 files in 0.2438 s, 6079.2268 files/s 
+>> YAT 3, MONTH 4 start 
+>> YAT 3, MONTH 4 end, 1440 files in 0.2436 s, 5910.7477 files/s 
+>> YAT 3, MONTH 5 start 
+>> YAT 3, MONTH 5 end, 96 files in 0.3361 s, 285.5885 files/s 
+>> YAT 3 end, 3018 files in 0.3363 s, 8974.4772 files/s 

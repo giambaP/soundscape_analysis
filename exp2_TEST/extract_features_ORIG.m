@@ -17,7 +17,7 @@ nomefs{11} = 'TimeMaxAcf';
 
 featuresCount = length(nomefs);
 
-templatesDir = './TEST_templates_OLD';
+templatesDir = './TEST_templates_OLD2';
 
 tic; % total
 
@@ -124,7 +124,7 @@ for fs=1:featuresCount
     load(featureFilePath);
 
     data = [data featuresSet];
-    save('./TEST_templates/matriceTEST.mat', 'data');
+    save(sprintf('%s/matrixAllFeatures.mat', templatesDir), 'data');
 end
 
 elapsed = toc;

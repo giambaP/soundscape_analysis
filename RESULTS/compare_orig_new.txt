@@ -12,3 +12,7 @@ concat time 11 sec
 
 18:36:37
 18:38:30 -> 800 file per prima feature 
+
+
+
+matrixAllFeatures

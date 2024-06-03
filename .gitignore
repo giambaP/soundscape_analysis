@@ -6,3 +6,5 @@ exp*/spectrogram
 exp*/templates*
 exp*/database*
 exp*/TEST*
+exp*/labels
+exp*/BKG_*

@@ -26,7 +26,7 @@ for fs=1:featuresCount
     fprintf('%2d. %s: starting \n', fs, featureName);
 
     featureFilePath = sprintf("%s_%s.mat", nomeexp, featureName);
-    if ~exist(featureFilePath, "file")
+    % if ~exist(featureFilePath, "file")
         featuresSet = [];
         labels = [];
 
@@ -106,7 +106,7 @@ for fs=1:featuresCount
             fprintf('%2d. %s, YAT %d: ended  \n', fs, featureName, YAT);
         end
         save(featureFilePath,'featuresSet','labels');
-    end
+    % end
 end
 
 elapsed = toc;

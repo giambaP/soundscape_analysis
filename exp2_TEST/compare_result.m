@@ -9,6 +9,8 @@ dirTemplateNew = "./TEST_templates_NEW";
 dirTemplateOriginal = "./TEST_templates_OLD";
 fileList = dir(dirTemplateOriginal);
 fileList = fileList(~[fileList.isdir]);
+
+
 for i=1:length(fileList)
     fileName = fileList(i, :).name;
     fprintf("%d. checking file %s\n", i, fileName);
@@ -16,7 +18,7 @@ for i=1:length(fileList)
     origFilePath = sprintf("%s/%s", dirTemplateOriginal, fileName);
     newFilePath = sprintf("%s/%s", dirTemplateNew, fileName);
     if ~exist(newFilePath , "file")
-        error("feature file not exist final path: feature '%s'\n", fileName);
+        fprintf("ERR fileName '%-30s': feature file not exist final path: feature '%s'\n", fileName, fileName);
     else
         data1 = load(origFilePath);
         data2 = load(newFilePath);
@@ -25,15 +27,15 @@ for i=1:length(fileList)
         fields2 = fieldnames(data2);
 
         if ~isequal(fields1, fields2)
-            error("feature content files are different: file '%s', field '%s'", fileName, fields1);
+            fprintf("ERR fileName '%-30s': feature content files are different: file '%s', field '%s'\n", fileName,fileName, fields1);
         else
             isEqual = true;
             for j = 1:length(fields1)
                 d1 = data1.(fields1{j});
                 d2 = data2.(fields2{j});
                 if ~isequal(d1, d2)
-                    error("feature content fields are different: file '%s', field '%s', posJ:'%d'", ...
-                        fileName, fields1{j}, j);
+                    fprintf("ERR fileName '%-30s': feature content fields are different: file '%s', field '%s', posJ:'%d'\n", ...
+                        fileName,fileName, fields1{j}, j);
                 end
             end
         end

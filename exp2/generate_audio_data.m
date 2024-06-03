@@ -1,7 +1,7 @@
 clc; clear all; close all;
 
 sourceDir = "../downloadAllAudible/datasetAll";
-targetDir = './templates/';
+targetDir = './labels/';
 
 matrixFileName = "audio_data.mat";
 

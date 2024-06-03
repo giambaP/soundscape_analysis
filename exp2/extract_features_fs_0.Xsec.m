@@ -1,32 +1,21 @@
-
 clc; clear all; close all
+addpath("functions/");
 
 %% configuration
 
 audioDir = "../downloadAllAudible/datasetAll";
-spectrogramDir = './TEST_spectrogram';
-templateDir = './TEST_templates_NEW';
+spectrogramDir = './spectrogram';
+templateDir = './templates_fs0.Xs';
 
 % spectrogram conf
 iBlockLength = 4096 * 8;
 iHopLength = 2048 * 8;
 
 % block execution
-threadsCount = 10;
-blockSize = 96; % files processed in every block
-
-% features names
-featureNames{1} = 'SpectralCentroid';
-featureNames{2} = 'SpectralCrestFactor';
-featureNames{3} = 'SpectralDecrease';
-featureNames{4} = 'SpectralFlatness';
-featureNames{5} = 'SpectralFlux';
-featureNames{6} = 'SpectralRolloff';
-featureNames{7} = 'SpectralSpread';
-featureNames{8} = 'SpectralTonalPowerRatio';
-featureNames{9} = 'TimeZeroCrossingRate';
-featureNames{10} = 'TimeAcfCoeff';
-featureNames{11} = 'TimeMaxAcf';
+threadsCount = 8;
+blockSize = 1000; % files processed in every block
+% elements of each feature
+elementsPerFeature = 176;
 
 %% functions
 
@@ -37,37 +26,37 @@ end
 
 %% setup context
 
-featuresCount = length(featureNames);
+featuresCount = Features.getSize();
 
 % create result dir if not exists
 if ~exist(spectrogramDir, 'dir'); mkdir(spectrogramDir); end
 if ~exist(templateDir, 'dir'); mkdir(templateDir); end
 
-load("./templates/audio_data.mat");
-filesCount = 96; %size(audioData, 1); %%%____________TODOOOO__________________
+load(sprintf("./%s/audio_data.mat", templateDir));
+filesCount = size(audioData, 1); 
 
 % block checks
 blockSize = min(blockSize, filesCount);
 blockCount = max(ceil(filesCount/blockSize), 1);
 
 % features result structures
-featureSpectralCentroid = zeros(filesCount, 176);
-featureSpectralCrestFactor= zeros(filesCount, 176);
-featureSpectralDecrease= zeros(filesCount, 176);
-featureSpectralFlatness= zeros(filesCount, 176);
-featureSpectralFlux= zeros(filesCount, 176);
-featureSpectralRolloff= zeros(filesCount, 176);
-featureSpectralSpread= zeros(filesCount, 176);
-featureSpectralTonalPowerRatio = zeros(filesCount, 176);
-featureTimeZeroCrossingRate = zeros(filesCount, 176);
-featureTimeAcfCoeff = zeros(filesCount, 176);
-featureTimeMaxAcf = zeros(filesCount, 176);
+featureSpectralCentroid = zeros(filesCount, elementsPerFeature);
+featureSpectralCrestFactor= zeros(filesCount, elementsPerFeature);
+featureSpectralDecrease= zeros(filesCount, elementsPerFeature);
+featureSpectralFlatness= zeros(filesCount, elementsPerFeature);
+featureSpectralFlux= zeros(filesCount, elementsPerFeature);
+featureSpectralRolloff= zeros(filesCount, elementsPerFeature);
+featureSpectralSpread= zeros(filesCount, elementsPerFeature);
+featureSpectralTonalPowerRatio = zeros(filesCount, elementsPerFeature);
+featureTimeZeroCrossingRate = zeros(filesCount, elementsPerFeature);
+featureTimeAcfCoeff = zeros(filesCount, elementsPerFeature);
+featureTimeMaxAcf = zeros(filesCount, elementsPerFeature);
 
 %% execution
 
 fprintf("> execution start \n");
 fprintf("> parallel threads %d \n", threadsCount);
-fprintf("> %d files divided into %d blocks of size %d for \n", filesCount, blockCount, blockSize);
+fprintf("> %d files divided into %d blocks of size %d\n", filesCount, blockCount, blockSize);
 
 % delete all files in temp dir
 delete(sprintf("%s/*.mat", spectrogramDir));
@@ -179,13 +168,13 @@ fprintf('> processed all blocks for %d files in %.4f sec ( %.4f files/s ) \n', f
 
 clear audioData;
 
-%% SAVING FEATURES MATRICES
+%% saving features into files
 
 ticSavingMatrix = tic;
 
 % saving all files
 for featureId = 1:featuresCount
-    featureName = featureNames{featureId};
+    featureName = Features.getEnumByIndex(featureId).Name;
     featureVarName = sprintf("feature%s", featureName);
     featureSet = eval(featureVarName);
     save(sprintf("%s/%s.mat", templateDir, featureName), "-fromstruct", struct("featuresSet", featureSet));
@@ -196,14 +185,14 @@ clear featureSet;
 elapsed = toc(ticSavingMatrix);
 fprintf('> saved all files in %.4f sec, %.4f featureFile/s\n', elapsed, featuresCount/elapsed);
 
-%% CONCATENATION OF ALL FEATURES IN ONE MATRIX
+%% concatenation of all features files into one file
 
 ticConcatFiles = tic;
 
 data = [];
 % concating all feature horizontally
 for featureId = 1:featuresCount
-    featureName = featureNames{featureId};
+    featureName = Features.getEnumByIndex(featureId).Name;
     fprintf('Adding feature %s to result matrix \n', featureName);
 
     featureFilePath = sprintf("%s/%s.mat", templateDir, featureName);
@@ -221,7 +210,8 @@ fprintf('> concatenation time in %.4f sec for %d files and %d features, %.4f fea
     elapsed, filesCount, featuresCount, (filesCount*featuresCount)/elapsed);
 
 
-%% CONCLUSION
+%% conclusion
+
 elapsed = toc(ticStart);
 fprintf('> TOTAL EXECUTION TIME %.4f sec for %d files and %d features, speed %.4f featureFile/s\n', ...
     elapsed, filesCount, featuresCount, (filesCount*featuresCount)/elapsed);

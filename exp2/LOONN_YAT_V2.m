@@ -1,4 +1,4 @@
-%LOONN
+    %LOONN
 clc; close all; clear all;
 
 nomefs{1} = 'SpectralCentroid';
@@ -14,8 +14,15 @@ nomefs{10} = 'TimeAcfCoeff';
 nomefs{11} = 'TimeMaxAcf';
 % Mfccs excluded
 
-load("./TEST_templates_OLD/matrixAllFeatures.mat");
-load("./TEST_templates_OLD/labelsYAT.mat");
+matrixDataName = "matrixAllFeatures.mat";
+matrixLabelsName = "labelsYAT.mat";
+
+load(sprintf("./templates/%s", matrixDataName));
+fprintf("loaded audio data from '%s'\n", matrixDataName);
+load(sprintf("./templates/%s", matrixLabelsName));
+fprintf("loaded labels data from '%s'\n", matrixLabelsName);
+
+% filtering labels
 labels = labelsYAT(1:size(data, 1),1);
 
 
@@ -47,6 +54,8 @@ for j = 1 : objsCount
         featuresMean(j, i+1) = mean(data(j, (featSize*i+1):(featSize*(i+1))));
     end
 end
+fprintf("> mean completed\n");
+
 featuresAvgSpectralIdxs = [1, 3, 5, 6, 7];
 featuresAvgTonalessIdxs = [2, 4, 8];
 featuresAvgTimeIdxs = [9, 10, 11];
@@ -55,45 +64,72 @@ featuresAvgTimeIdxs = [9, 10, 11];
 % 19 calc * 2: orig and std -> label, error, standardization on/off
 results = cell(19*2, 3); 
 
+function str = getStd(st)
+    str = "normal";
+    if (st == 1)
+        str = "std";
+    end
+end
+
 for st = 0:1
+    fprintf("\n--- LOONNErr %s ------------------------\n", getStd(st));
+
     % LOONN all features
+    fprintf("> conc feat all (%s): start\n", getStd(st));
     [err] = LOONNErr(data, allFeaturesIdxs, labels, st);
-    results(1 + st*19, :) = {"conc feat all", err, st};
+    results(1 + st*19, :) = {"conc feat all", err, st}; 
+    fprintf("> conc feat all (%s): end\n", getStd(st));
     
     % LOONN spectral features
+    fprintf("> conc feat spectral (%s): start\n", getStd(st)); 
     [err] = LOONNErr(data, featuresSpectralIdxs, labels, st);
-    results(2 + st*19, :) = {"conc feat spectral", err, st};
+    results(2 + st*19, :) = {"conc feat spectral", err, st}; 
+    fprintf("> conc feat spectral (%s): end\n", getStd(st));
 
     % LOONN tonaless features
     [err] = LOONNErr(data, featuresTonalessIdxs, labels, st);
-    results(3 + st*19, :) = {"conc feat tonaless", err, st};
+    results(3 + st*19, :) = {"conc feat tonaless", err, st}; 
+    fprintf("> conc feat tonaless (%s): start\n", getStd(st)); 
+    fprintf("> conc feat tonaless (%s): end\n", getStd(st));
 
     % LOONN time features    
+    fprintf("> conc feat time (%s): start\n", getStd(st)); 
     [err] = LOONNErr(data, featuresTimeIdxs, labels, st);
-    results(4 + st*19, :) = {"conc feat time", err, st};
+    results(4 + st*19, :) = {"conc feat time", err, st}; 
+    fprintf("> conc feat time (%s): end\n", getStd(st));
 
     % LOONN all mean features 
+    fprintf("> conc avg feat all (%s): start\n", getStd(st)); 
     [err] = LOONNErr(featuresMean, 1:(featuresCount), labels, st);
-    results(5 + st*19, :) = {"conc avg feat all", err, st};
+    results(5 + st*19, :) = {"conc avg feat all", err, st}; 
+    fprintf("> conc avg feat all (%s): end\n", getStd(st));
 
     % LOONN mean of spectral features
+    fprintf("> conc avg feat spectral (%s): start\n", getStd(st)); 
     [err] = LOONNErr(featuresMean, featuresAvgSpectralIdxs, labels, st);
-    results(6 + st*19, :) = {"conc avg feat spectral", err, st};
+    results(6 + st*19, :) = {"conc avg feat spectral", err, st}; 
+    fprintf("> conc avg feat spectral (%s): end\n", getStd(st));
 
     % LOONN mean of tonaless features
+    fprintf("> conc avg feat tonaless (%s): start\n", getStd(st)); 
     [err] = LOONNErr(featuresMean, featuresAvgTonalessIdxs, labels, st);
-    results(7 + st*19, :) = {"conc avg feat tonaless", err, st};
+    results(7 + st*19, :) = {"conc avg feat tonaless", err, st}; 
+    fprintf("> conc avg feat tonaless (%s): end\n", getStd(st));
 
     % LOONN mean of time features
+    fprintf("> conc avg feat time (%s): start\n", getStd(st)); 
     [err] = LOONNErr(featuresMean, featuresAvgTimeIdxs,labels, st);
-    results(8 + st*19, :) = {"conc avg feat time", err, st};
+    results(8 + st*19, :) = {"conc avg feat time", err, st}; 
+    fprintf("> conc avg feat time (%s): end\n", getStd(st));
 
     % LOONN single feature
+    fprintf("> conc feat all (%s): start\n", getStd(st)); 
     for i = 0 : (featuresCount-1)
         features = (featSize*i+1):(featSize*(i+1));
         [err] = LOONNErr(data, features, labels, st);
         results(9 + i + st*19, :) = {sprintf("feat %s", nomefs{i+1}), err, st};
     end
+    fprintf("> conc feat all (%s): end\n", getStd(st));
 end
 
 for i=1:size(results,1)

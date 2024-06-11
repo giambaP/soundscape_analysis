@@ -5,6 +5,7 @@ addpath("functions/");
 
 audioDir = "../downloadAllAudible/datasetAll";
 spectrogramDir = './spectrogram';
+labelsDir = './labels';
 templateDir = './templates_fs1s';
 
 % spectrogram conf
@@ -32,8 +33,8 @@ featuresCount = Features.getSize();
 if ~exist(spectrogramDir, 'dir'); mkdir(spectrogramDir); end
 if ~exist(templateDir, 'dir'); mkdir(templateDir); end
 
-load(sprintf("./%s/audio_data.mat", templateDir));
-filesCount = size(audioData, 1); %%%____________TODOOOO__________________
+load(sprintf("./%s/audio_data.mat", labelsDir));
+filesCount = size(audioData, 1); 
 
 % block checks
 blockSize = min(blockSize, filesCount);

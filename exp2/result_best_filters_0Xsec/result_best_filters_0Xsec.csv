@@ -1,0 +1,39 @@
+RESULT TYPE,STD,"UPP-20,LOW-20"
+conc feat all,0,0.267985611510791
+conc feat spectral,0,0.267985611510791
+conc feat tonaless,0,0.613309352517986
+conc feat time,0,0.237410071942446
+conc avg feat all,0,0.239208633093525
+conc avg feat spectral,0,0.239208633093525
+conc avg feat tonaless,0,0.507194244604317
+conc avg feat time,0,0.212230215827338
+feat SpectralCentroid,0,0.363309352517986
+feat SpectralCrestFactor,0,0.622302158273381
+feat SpectralDecrease,0,0.469424460431655
+feat SpectralFlatness,0,0.665467625899281
+feat SpectralFlux,0,0.553956834532374
+feat SpectralRolloff,0,0.327338129496403
+feat SpectralSpread,0,0.467625899280576
+feat SpectralTonalPowerRatio,0,0.580935251798561
+feat TimeZeroCrossingRate,0,0.404676258992806
+feat TimeAcfCoeff,0,0.557553956834532
+feat TimeMaxAcf,0,0.647482014388489
+conc feat all,1,0.203237410071942
+conc feat spectral,1,0.22841726618705
+conc feat tonaless,1,0.537769784172662
+conc feat time,1,0.239208633093525
+conc avg feat all,1,0.122302158273381
+conc avg feat spectral,1,0.205035971223022
+conc avg feat tonaless,1,0.449640287769784
+conc avg feat time,1,0.199640287769784
+feat SpectralCentroid,1,0.356115107913669
+feat SpectralCrestFactor,1,0.62589928057554
+feat SpectralDecrease,1,0.460431654676259
+feat SpectralFlatness,1,0.665467625899281
+feat SpectralFlux,1,0.555755395683453
+feat SpectralRolloff,1,0.323741007194245
+feat SpectralSpread,1,0.45863309352518
+feat SpectralTonalPowerRatio,1,0.575539568345324
+feat TimeZeroCrossingRate,1,0.397482014388489
+feat TimeAcfCoeff,1,0.56294964028777
+feat TimeMaxAcf,1,0.643884892086331

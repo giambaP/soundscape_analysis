@@ -44,6 +44,8 @@ filesIndexes = intersect(monthIndexes, hoursIndexes);
 filesIndexes = intersect(filesIndexes, minutesIndexes);
 
 % filesIndexes = filesIndexes([ 1:15 400:410 ],:);
+% filesIndexes = filesIndexes([ 1:15 150:160 220:230 340:350 430:440 540:550 ],:);
+
 audioData = audioData(filesIndexes, :);
 load(sprintf("./%s/labels_Yat.mat", labelsDir));
 labels = labels(filesIndexes, :);
@@ -74,8 +76,8 @@ ticStart = tic;
 
 %% filtering, concatenation and LOON execution for each filter
 
-upperFilters = 0:5:15;
-lowerFilters = 0:5:15;
+upperFilters = 20:20;
+lowerFilters = 20:20;
 filtersCount = numel(upperFilters) * numel(lowerFilters);
 
 % LOONN result

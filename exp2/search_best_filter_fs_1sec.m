@@ -5,17 +5,17 @@ addpath("functions/");
 
 audioDir = "../downloadAllAudible/datasetAll";
 labelsDir = './labels';
-resultDir = './result_best_filters_0Xsec';
-resultFileName = 'result_best_filters_0Xsec';
+resultDir = './result_best_filters_1sec';
+resultFileName = 'result_best_filters_1sec';
 
 % spectrogram conf
-iBlockLength = 4096 * 8;
-iHopLength = 2048 * 8;
+iBlockLength = 48000;
+iHopLength = 48000 / 2;
 
 % block execution
 threadsCount = 8;
 % elements of each feature
-elementsPerFeature = 176;
+elementsPerFeature = 120;
 featuresCount = 11;
 
 %% setup context

@@ -18,13 +18,6 @@ blockSize = 1000; % files processed in every block
 % elements of each feature
 elementsPerFeature = 176;
 
-%% functions
-
-function [startIdx, endIdx] = calcRange(rangeId, rangeSize, totalSize)
-startIdx = 1 + (rangeId * rangeSize);
-endIdx = min((rangeId+1) * rangeSize, totalSize);
-end
-
 %% setup context
 
 featuresCount = Features.getSize();

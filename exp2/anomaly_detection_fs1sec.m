@@ -3,7 +3,7 @@
 %% CONFIGURATION
 
 clearResultDir = 1;
-fsType = "fs0X";
+fsType = "fs1";
 audioDir = "../downloadAllAudible/datasetAll";
 labelsDir = './labels';
 anomalousAudioDir = "./anomalousAudioData";

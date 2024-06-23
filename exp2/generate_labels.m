@@ -16,15 +16,15 @@ elseif ~exist(audioMatrixDataPath, "file")
 end
 
 % audioData structure
-uniqueNameColumn = 1;
-audioNameColumn = 2;
-audioNameNoExtensionColumn = 3;
-yatColumn = 4;
-yearColumn = 5;
-monthColumn = 6;
-dayColumn = 7;
-hourColumn = 8;
-minuteColumn = 9;
+uniqueNameColumn = AudioDataColumnIndex.UniqueName.index;
+audioNameColumn = AudioDataColumnIndex.AudioName.index;
+audioNameNoExtensionColumn = AudioDataColumnIndex.AudioNameNoExtension.index;
+yatColumn = AudioDataColumnIndex.Yat.index;
+yearColumn = AudioDataColumnIndex.Year.index;
+monthColumn = AudioDataColumnIndex.Month.index;
+dayColumn = AudioDataColumnIndex.Day.index;
+hourColumn = AudioDataColumnIndex.Hour.index;
+minuteColumn = AudioDataColumnIndex.Minute.index;
 
 %% EXECUTION
 

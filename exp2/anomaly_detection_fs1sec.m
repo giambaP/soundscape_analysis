@@ -1,49 +1,52 @@
-% clc; close all; clear all;
+clc; close all; clear all;
 
 %% CONFIGURATION
 
-clearResultDir = 1;
-fsType = "fs1";
+featuresCount = 11;
+featSize = 120;
+sampleRate = "fs1";
+
 audioDir = "../downloadAllAudible/datasetAll";
 labelsDir = './labels';
 anomalousAudioDir = "./anomalousAudioData";
 anomalousAudioResultDir = sprintf("./%s/result", anomalousAudioDir);
-templatesDirPath = sprintf("./templates_%ss", fsType);
+templatesDirPath = sprintf("./templates_%ss", sampleRate);
 matrixFeaturesName = "matrixAllFeatures.mat";
-baseUrl = "http://colecciones.humboldt.org.co/rec/sonidos/publicaciones/MAP/JDT-Yataros";
+
+threadsCount = 8;
+clearResultDir = 1;
+
+baseAudioUrl = "http://colecciones.humboldt.org.co/rec/sonidos/publicaciones/MAP/JDT-Yataros";
 
 %% FUNCTIONS
+
+function args = printVarargin(varargin) 
+    args = '';
+    for i = 1:2:length(varargin)
+        varName = varargin{1,i};
+        varValue = varargin{1,i+1};
+        if ischar(varValue); placeHolder = "%s";
+        elseif mod(varValue, 0) == 0; placeHolder = "%d";
+        else; placeHolder = "%0.5f";
+        end
+        args = strcat(args, sprintf(strcat(" %s = ", placeHolder, " "), varName, varValue));
+        if i+1 ~= length(varargin); args = strcat(args, ", "); end
+    end
+    if ~isempty(args); args = sprintf("args [%s]", args); end
+end
 
 % Wrap of Iforest function:
 %   arg: CategoricalPredictors - sublist to process, default []
 %   arg: ContaminationFraction - threshold of suspected objs to consider anomalies, default 0
 %   arg: NumLearners - trees count, default 100
-function result = myIforest(X, varargin)
-args = "";
-for i = 1:2:length(varargin)
-    varName = varargin{1,i};
-    varValue = varargin{1,i+1};
-    if ischar(varValue); placeHolder = "%s";
-    elseif mod(varValue, 0) == 0; placeHolder = "%d";
-    else; placeHolder = "%0.5f";
-    end
-    args = strcat(args, sprintf(strcat(" %s = ", placeHolder, " "), varName, varValue));
-    if i+1 ~= length(varargin); args = strcat(args, ", "); end
-end
-
-fprintf("iforest START - args [ %s ] \n", args);
+function result = myIforest(executionId, X, varargin)
+args = printVarargin(varargin{:});
 ticIForest = tic;
-
 [mdl, tf, scores] = iforest(X, varargin{:});
-result = struct('mdl', mdl, 'tf', tf, 'scores', scores);
-threshold = mdl.ScoreThreshold;
-scoresMean = mean(scores);
-scoresStd = std(scores);
-countAnomalies = sum(tf);
-
 elapsed = toc(ticIForest);
-fprintf("iforest result { threshold: %0.5f, anomalies: %d, scores mean: %0.5f, scores std: %0.5f } \n", threshold, countAnomalies, scoresMean, scoresStd);
-fprintf("iforest END, %0.5f s \n", elapsed);
+result = struct('mdl', mdl, 'tf', tf, 'scores', scores);
+fprintf("> %s: iforest terminated in %0.5f sec, %s [ anomalies:%d, threshold:%0.5f, scoresMean:%0.5f, scoresStd:%0.5f ] \n", ...
+    executionId, elapsed, args, sum(tf), mdl.ScoreThreshold, mean(scores), std(scores));
 end
 
 
@@ -51,152 +54,261 @@ end
 
 if ~exist(anomalousAudioResultDir, 'dir'); mkdir(anomalousAudioResultDir); end
 
-
-%% EXECUTION
-
 mtx = load(sprintf("%s/%s", templatesDirPath, matrixFeaturesName));
+data = mtx.data;
+audioDataMtx = load(sprintf("./%s/audio_data.mat", labelsDir));
+audioData = audioDataMtx.audioData;
 
-% SHOW FOREST CHART
-iForestChartData = myIforest(mtx.data);
+if size(data,2) ~= (featuresCount*featSize); error("invalid feature size"); end
+
+%% FEATURES DEFINITION
+
+allFeaturesIdxs = 1:(featSize*11);
+
+spectralCentroidIdxs = 1:featSize;
+spectralCrestFactorIdxs = (featSize*1+1):(featSize*2);
+spectralDecreaseIdxs = (featSize*2+1):(featSize*3);
+spectralFlatnessIdxs = (featSize*3+1):(featSize*4);
+spectralFluxIdxs = (featSize*4+1):(featSize*5);
+spectralRolloffIdxs = (featSize*5+1):(featSize*6);
+spectralSpreadIdxs = (featSize*6+1):(featSize*7);
+spectralTonalPowerRatioIdxs = (featSize*7+1):(featSize*8);
+timeZeroCrossingRateIdxs = (featSize*8+1):(featSize*9);
+timeAcfCoeffIdxs = (featSize*9+1):(featSize*10);
+timeMaxAcfIdxs = (featSize*10+1):(featSize*11);
+
+featuresSpectralIdxs = [spectralCentroidIdxs, spectralDecreaseIdxs, spectralFluxIdxs, spectralRolloffIdxs, spectralSpreadIdxs];
+featuresTonalessIdxs = [spectralCrestFactorIdxs, spectralFlatnessIdxs, spectralTonalPowerRatioIdxs];
+featuresTimeIdxs = [timeZeroCrossingRateIdxs, timeAcfCoeffIdxs, timeMaxAcfIdxs];
+
+featuresAvgSpectralIdxs = [1, 3, 5, 6, 7];
+featuresAvgTonalessIdxs = [2, 4, 8];
+featuresAvgTimeIdxs = [9, 10, 11];
+
+function featuresMean = calcFeaturesMean(data, featuresCount) 
+    rowsSize = size(data, 1);
+    featSize = size(data, 2) / featuresCount;
+    featuresMean = zeros(rowsSize, 11);
+    for j = 1 : rowsSize
+        for i = 0 : (featuresCount-1)
+            featuresMean(j, i+1) = mean(data(j, (featSize*i+1):(featSize*(i+1))));
+        end
+    end
+end
+
+function commonValues = multiIntersect(arrays)
+    commonValues = arrays{1};
+    for i = 2:length(arrays)
+        commonValues = intersect(commonValues, arrays{i});
+    end
+end
+
+%% MULTITHREADING
+%
+ticWorkers = tic;
+fprintf("> try to init workers \n");
+% overriding workers
+localCluster = parcluster('local');
+localCluster.NumWorkers = threadsCount;
+saveProfile(localCluster);
+% retrieving pool if exists
+pool = gcp('nocreate');
+if isempty(pool)
+    fprintf('> no existing pool found, creating new pool with %d workers\n', threadsCount);
+    parpool('local', threadsCount);
+else    
+    if pool.NumWorkers == threadsCount
+        fprintf('> using existing pool with %d workers\n', pool.NumWorkers);
+    else
+        fprintf('> existing pool has %d workers, deleting it\n', pool.NumWorkers);
+        delete(pool);
+        parpool('local', threadsCount);
+        fprintf('> created new pool with %d workers\n', threadsCount);
+    end
+end
+elapsed = toc(ticWorkers);
+fprintf('> startup %d workers in %.4f sec\n', threadsCount, elapsed);
+
+%}
+
+%% SHOW FOREST CHART
+%{
+mtx = load(sprintf("%s/%s", templatesDirPath, matrixFeaturesName));
+iForestChartData = myIforest("chart", data);
 figure;
 histogram(iForestChartData.scores);
 title("IForest - trees 100");
 xlabel("scores");
 ylabel("occurences");
 xline(iForestChartData.mdl.ScoreThreshold,"r-",["Threshold" iForestChartData.mdl.ScoreThreshold]);
-savefig(sprintf('%s/%s_%s.fig', anomalousAudioDir, "anomalies_histogram", fsType));
+savefig(sprintf('%s/%s_%s.fig', anomalousAudioDir, "anomalies_histogram", sampleRate));
+%}
 
-% COMPARISON OF DIFFERENT TREES
-% disp("> Comparison different trees: ");
-% iforTree100 = myIforest(mtx.data, ContaminationFraction=0.03, NumLearners=100);
-% iforTree200 = myIforest(mtx.data, ContaminationFraction=0.03, NumLearners=200);
-% iforTree300 = myIforest(mtx.data, ContaminationFraction=0.03, NumLearners=300);
-% iforTree300 = myIforest(mtx.data, ContaminationFraction=0.03, NumLearners=400);
-% if ~isequal(iforTree100.tf, iforTree200.tf); disp("100 vs 200 NOT EQUAL");
-% elseif ~isequal(iforTree100.tf, iforTree300.tf); disp("100 vs 200 NOT EQUAL");
-% elseif ~isequal(iforTree100.tf, iforTree400.tf); disp("100 vs 200 NOT EQUAL");
-% else; disp("100, 200, 300, 400 trees have same results");
-% end
+%% RETRIEVE CONTAMINATION PERCENTAGE FROM SCORES
+%{
+mtx = load(sprintf("%s/%s", templatesDirPath, matrixFeaturesName));
+contamination = 0.01;
+iForRes = myIforest("test", data, ContaminationFraction=contamination);
+anomaliesIdx = find(iForRes.tf == 1);
+threshold = quantile(iForRes.scores, 1 - contamination);
+tfReplica = iForRes.scores > threshold;
+anomaliesReplicaIdx = find(tfReplica == 1);
+%}
 
-% RETRIEVE CONTAMINATION PERCENTAGE FROM SCORES
-% contamination = 0.01;
-% iForRes = myIforest(mtx.data, ContaminationFraction=contamination);
-% anomaliesIdx = find(iForRes.tf == 1);
-% threshold = quantile(iForRes.scores, 1 - contamination);
-% tfReplica = iForRes.scores > threshold;
-% anomaliesReplicaIdx = find(tfReplica == 1);
+%% COPYING ALL ANOMALOUS DATA
+%{
+    anomalousAudioData = audioDataMtx.audioData(anomalousAudioFilteredIdx, :);
+    for j = 1:size(anomalousAudioData, 1)
+        audioDataFileName = anomalousAudioData{j, AudioDataColumnIndex.AudioName.index};
+        yat = anomalousAudioData{j, AudioDataColumnIndex.Yat.index};
 
-% COPYING ALL ANOMALOUS DATA
-% clearing anomalous audio dir
-% if clearResultDir && isfolder(anomalousAudioResultDir)
-%     rmdir(sprintf("%s", anomalousAudioResultDir), "s");
-% end
-%
-% % iforest with different contamination params
-% audioDataMtx = load(sprintf("./%s/audio_data.mat", labelsDir));
-% allAnomalousAudioIdx = []; %zeros(0, 2);
-% contaminationParams = 0.01:0.01:1;
-% iForRes = myIforest(mtx.data);
-% for c = contaminationParams
-%     threshold = quantile(iForRes.scores, 1 - c);
-%     tf = iForRes.scores > threshold;
-%     anomalousAudioIdx = find(tf == 1);
-%
-%     % filtering indexes already processed
-%     anomalousAudioFilteredIdx = setdiff(anomalousAudioIdx, allAnomalousAudioIdx);
-%     % updating all array with new indexes
-%     allAnomalousAudioIdx = sort(vertcat(anomalousAudioFilteredIdx, allAnomalousAudioIdx));
-%
-%     % copying audio to anomalous audio dir
-%     anomalousAudioData = audioDataMtx.audioData(anomalousAudioFilteredIdx, :);
-%     for j = 1:size(anomalousAudioData, 1)
-%         audioDataFileName = anomalousAudioData{j, AudioDataColumnIndex.AudioName.index};
-%         yat = anomalousAudioData{j, AudioDataColumnIndex.Yat.index};
-%
-%         sourceAudioPath = sprintf("%s/YAT%dAudible/%s", audioDir, yat, audioDataFileName);
-%         anomalousAudioPath = sprintf("%s/contamination_%0.2f/YAT%dAudible/", anomalousAudioResultDir, c, yat);
-%
-%         if ~exist(anomalousAudioPath, 'dir'); mkdir(anomalousAudioPath); end
-%         copyfile(sourceAudioPath, anomalousAudioPath, 'f');
-%     end
-% end
+        sourceAudioPath = sprintf("%s/YAT%dAudible/%s", audioDir, yat, audioDataFileName);
+        anomalousAudioPath = sprintf("%s/contamination_%0.2f/YAT%dAudible/", anomalousAudioResultDir, c, yat);
 
-% MIX MULTIPLE RESULT 9000x1936
-executionCount = 10;
-objCount = size(mtx.data, 1);
-results = cell(objCount+1, executionCount * 2); % 2 values per execution: contamination, score, +1 for threshold
-for e = 1:executionCount
-    allAnomalousAudioIdx = [];
-    fprintf("execution %3d\n",i);
-    iForRes = myIforest(mtx.data);
-
-    contaminationParams = 0.01:0.01:1;
-    for c = contaminationParams
-        threshold = quantile(iForRes.scores, 1 - c);
-        tf = iForRes.scores > threshold;
-        anomalousAudioIdx = find(tf == 1);
-
-        % filtering indexes already processed
-        anomalousAudioFilteredIdx = setdiff(anomalousAudioIdx, allAnomalousAudioIdx);
-        % updating all array with new indexes
-        allAnomalousAudioIdx = sort(vertcat(anomalousAudioFilteredIdx, allAnomalousAudioIdx));
-
-        filteredScores = iForRes.scores(anomalousAudioFilteredIdx);
-        results(anomalousAudioFilteredIdx, (e * 2)-1) = num2cell(c * ones(size(anomalousAudioFilteredIdx, 1), 1));
-        results(anomalousAudioFilteredIdx, (e * 2) ) = num2cell(filteredScores);
+        if ~exist(anomalousAudioPath, 'dir'); mkdir(anomalousAudioPath); end
+        copyfile(sourceAudioPath, anomalousAudioPath, 'f');
     end
-    % at least row score threshold
-    results(end, (e * 2)-1) = num2cell(iForRes.mdl.ScoreThreshold);
-    results(end, (e * 2) ) = num2cell(iForRes.mdl.ScoreThreshold);
+%}
+
+%% MIX MULTIPLE RESULT ALL FEATURES
+%
+function stdData = standardizeData(data)
+    a = std(data);
+    keep = a > 0;
+    data = data(:,keep);
+    stdData = zscore(data);
 end
 
-audioDataMtx = load(sprintf("./%s/audio_data.mat", labelsDir));
+function results = writeAnomaliesInFile(samplingRate, checkType, audioData, data, standardize, conf)
+    rowsSize = size(data, 1);
+    
+    if standardize
+        data = standardizeData(data);
+    end
 
-rowIndex = cell(objCount, 1);
-rowIndex(1:objCount, 1) = num2cell(1:objCount);
-yats = audioDataMtx.audioData(:,AudioDataColumnIndex.Yat.index);
-years = audioDataMtx.audioData(:,AudioDataColumnIndex.Year.index);
-months = audioDataMtx.audioData(:,AudioDataColumnIndex.Month.index);
-days = audioDataMtx.audioData(:,AudioDataColumnIndex.Day.index);
-hours = audioDataMtx.audioData(:,AudioDataColumnIndex.Hour.index);
-minutes = audioDataMtx.audioData(:,AudioDataColumnIndex.Minute.index);
-audioNames = audioDataMtx.audioData(:,AudioDataColumnIndex.AudioName.index);
+    results = zeros(rowsSize, conf.executionCount);
+    parfor i = 1:conf.executionCount
+        executionId = sprintf("%s, execution %d started", checkType, i);
+        fprintf("> %s: iforest \n", executionId);
+        iForRes = myIforest(executionId, data);
+        results(:, i) = iForRes.scores;
+    end
+    resultsMean = mean(results, 2);
+    
+    % rows
+    samplingRates(1:rowsSize, 1) = samplingRate;
+    filesCount(1:rowsSize, 1) = rowsSize;
+    checkType(1:rowsSize, 1) = checkType;
+    rowIndex(1:rowsSize, 1) = num2cell(1:rowsSize);
+    yats = audioData(:,AudioDataColumnIndex.Yat.index);
+    years = audioData(:,AudioDataColumnIndex.Year.index);
+    months = audioData(:,AudioDataColumnIndex.Month.index);
+    days = audioData(:,AudioDataColumnIndex.Day.index);
+    hours = audioData(:,AudioDataColumnIndex.Hour.index);
+    minutes = audioData(:,AudioDataColumnIndex.Minute.index);
+    audioNames = audioData(:,AudioDataColumnIndex.AudioName.index);
+    resultsMeanCell = num2cell(resultsMean);
+    audioUrl = cell(rowsSize, 1);
+    uniqueNames = audioData(:,AudioDataColumnIndex.UniqueName.index);
+    for i = 1:rowsSize
+        audioUrl{i} = sprintf('%s/YAT%dAudible/%s', conf.baseAudioUrl, yats{i,1}, audioNames{i,1});
+    end    
+    rows = horzcat(samplingRates, filesCount, checkType, rowIndex, yats, years, months, days, hours, minutes, ...
+        audioNames, resultsMeanCell, audioUrl, uniqueNames);
+    % header
+    header = ["SmplRate" "#Files" "Check Type" "Index" "Yat" "Year" "Month" "Day" "Hour" "Minute" ...
+        "AudioName" sprintf("ScoresMeanOn%d", conf.executionCount) "AudioUrl", "UniqueNames"];
 
-headerContamination = cell(1, length(0:2:((executionCount * 2)-1)));
-for i = 1:length(headerContamination)
-    headerContamination{i} = sprintf('Cont_%d', i);
+    % top scores
+    [~, sortedIdx] = sort(resultsMean(:,1), 1, 'descend');
+    rows = rows(sortedIdx, :);
+    rows = rows(1:conf.topScoresCount, :);
+    
+    % write file with table
+    resultsTable = array2table(rows, 'VariableNames', header);
+    writetable(resultsTable, conf.resultFilePath, "WriteMode", "append");
 end
-headerScores = cell(1, length(1:2:(executionCount * 2)));
-for i = 1:length(headerScores)
-    headerScores{i} = sprintf('Score_%d', i);
+
+featuresMean = calcFeaturesMean(data, featuresCount);
+
+% removing old result file path
+resultFilePath = sprintf("%s/anomalies_result_%s_top_scores.csv", anomalousAudioDir, sampleRate);
+delete(resultFilePath);
+
+% executing anomaly detection
+function writeAnomalies(sampleRate, audioData, data, featuresMean, featuresCount, standardize, conf)
+    dataTypes = [ "normal" "zscore" ];
+    dataType = dataTypes(standardize+1);
+
+    % writeAnomaliesInFile(sampleRate,"conc feat all (" + dataType + ")", audioData, data(:,allFeaturesIdxs), standardize, conf);
+    % writeAnomaliesInFile(sampleRate,"conc feat spectral (" + dataType + ")", audioData, data(:,featuresSpectralIdxs), standardize, conf);
+    % writeAnomaliesInFile(sampleRate,"conc feat spectral (" + dataType + ")", audioData, data(:,featuresTonalessIdxs), standardize, conf);
+    % writeAnomaliesInFile(sampleRate,"conc feat time (" + dataType + ")", audioData, data(:,featuresTimeIdxs), standardize, conf);
+    writeAnomaliesInFile(sampleRate, "conc avg feat all (" + dataType + ")", audioData, featuresMean(:,1:(featuresCount)), standardize, conf);
+    % writeAnomaliesInFile(sampleRate, "conc avg feat spectral (" + dataType + ")", audioData, featuresMean(:,featuresAvgSpectralIdxs), standardize, conf);
+    % writeAnomaliesInFile(sampleRate, "conc avg feat tonaless (" + dataType + ")", audioData, featuresMean(:,featuresAvgTonalessIdxs), standardize, conf);
+    % writeAnomaliesInFile(sampleRate, "conc avg feat time (" + dataType + ")", audioData, featuresMean(:,featuresAvgTimeIdxs), standardize, conf);
+    % for i = 0 : (featuresCount-1)
+    %     featureName = Features.getEnumByIndex(i+1).Name;
+    %     features = (featSize*i+1):(featSize*(i+1));
+    %     writeAnomaliesInFile(sampleRate, sprintf("feature '%s' (%s)", featureName, dataType), audioData, data(:,features), standardize, conf);
+    % end
 end
-additionalColumnsBefore = 8;
-additionalColumnsAfter = 1;
-% index, yat, year, month, day, hour, minute, audioName, (contamination/score)-> 2*n, url 
-header = strings(1, additionalColumnsBefore + (executionCount * 2) + additionalColumnsAfter); 
-header(1, 1:additionalColumnsBefore) = [{"Index"} {"Yat"} {"Year"} {"Month"} {"Day"} {"Hour"} {"Minute"} {"AudioName"}];
-header(1, additionalColumnsBefore + ((0 + 1):2:(executionCount * 2))) = headerContamination;
-header(1, additionalColumnsBefore + ((1 + 1):2:(executionCount * 2))) = headerScores;
-header(1, ((end+additionalColumnsAfter)-1):end) = {"AudioUrl"};
 
-audioUrl = cell(objCount, 1);
-for i = 1:objCount
-    yat = audioDataMtx.audioData(i,AudioDataColumnIndex.Yat.index);
-    audioName = audioDataMtx.audioData(i,AudioDataColumnIndex.AudioName.index);
-    audioUrl{i} = sprintf('%s/YAT%dAudible/%s', baseUrl, yats{i,1}, audioNames{i,1});
-end
+stdOff = 0;
+stdOn = 1;
+conf.executionCount = 30;
+conf.resultFilePath = resultFilePath;
+conf.baseAudioUrl = baseAudioUrl;
+conf.topScoresCount = 10;
 
-% filling last rows (ScoreThreshold)
-rowIndex(end+1,:) = num2cell(" ");
-yats(end+1,:) = num2cell(" ");
-years(end+1,:) = num2cell(" ");
-months(end+1,:) = num2cell(" ");
-days(end+1,:) = num2cell(" ");
-hours(end+1,:) = num2cell(" ");
-minutes(end+1,:) = num2cell(" ");
-audioNames(end+1,:) = num2cell(" ");
-audioUrl(end+1,:) = num2cell(" ");
+% fprintf("\n--- SEARCHING ANOMALIES NORMAL ------------------------\n");
+% writeAnomalies(sampleRate, audioData, data, featuresMean, featuresCount, stdOff, conf);
 
-rows = horzcat(rowIndex, yats, years, months, days, hours, minutes, audioNames, results, audioUrl);
-resultsTable = cell2table(rows, 'VariableNames', header);
-writetable(resultsTable, sprintf('%s/%s_%s.csv', anomalousAudioDir, "anomalies_result", fsType));
+% fprintf("\n--- SEARCHING ANOMALIES WITH STANDARDIZATION ----------\n");
+% writeAnomalies(sampleRate, audioData, data, featuresMean, featuresCount, stdOn, conf);
+
+
+
+%  -------   SUBSET DATA yat1, march, h 2, 6, 10, 14, 18, 22, mm 00  -----------------------------
+
+yatColumn = AudioDataColumnIndex.Yat.index;
+yearColumn = AudioDataColumnIndex.Year.index;
+monthColumn = AudioDataColumnIndex.Month.index;
+dayColumn = AudioDataColumnIndex.Day.index;
+hourColumn = AudioDataColumnIndex.Hour.index;
+minuteColumn = AudioDataColumnIndex.Minute.index;
+
+yatsColumnData = cell2mat(audioData(:, yatColumn));
+yatIdxs = find(yatsColumnData == 1);
+monthColumnData = cell2mat(audioData(:, monthColumn));
+monthIdxs = find(monthColumnData == 3);
+hoursColumnData = cell2mat(audioData(:, hourColumn));
+hourValues = [2, 6, 10, 14, 18, 22];
+hourIdxs = find(ismember(hoursColumnData, hourValues) == 1);
+minutesColumnData = cell2mat(audioData(:, minuteColumn));
+minutesValues = find(minutesColumnData == 0);
+
+arrays = {yatIdxs, monthIdxs, hourIdxs, minutesValues};
+filteredIdxs = multiIntersect(arrays);
+dataFiltered = data(filteredIdxs, :);
+featuresMean = calcFeaturesMean(dataFiltered, featuresCount);
+
+audioData = audioData(filteredIdxs, :);
+
+conf.executionCount = 200;
+conf.topScoresCount = size(filteredIdxs, 1);
+conf.resultFilePath = sprintf("%s/anomalies_result_%s_top_scores_filtered.csv", anomalousAudioDir, sampleRate);
+delete(conf.resultFilePath);
+
+dataType = "zscore";
+standardize = stdOn;
+writeAnomaliesInFile(sampleRate, "conc avg feat all (" + dataType + ")", audioData, featuresMean(:,1:(featuresCount)), standardize, conf);
+
+
+%}
+
+
+disp("> EXECUTION COMPLETE");
+
+

@@ -121,14 +121,14 @@ for st = 0:1
     console(printExecution, "> conc avg feat time (%s): end\n", getStd(st));
 
     % LOONN single feature
-    console(printExecution, "> conc feat all (%s): start\n", getStd(st));
+    console(printExecution, "> conc all single features (%s): start\n", getStd(st));
     for i = 0 : (featuresCount-1)
         features = (featSize*i+1):(featSize*(i+1));
         [err] = LOONNErr(data, features, labels, st);
         featureName = Features.getEnumByIndex(i+1).Name;
         results(9 + i + st*19, :) = {sprintf("feat %s", featureName), err, st};
     end
-    console(printExecution, "> conc feat all (%s): end\n", getStd(st));
+    console(printExecution, "> conc all single features (%s): end\n", getStd(st));
 end
 
 if printResults == 1

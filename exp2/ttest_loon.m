@@ -3,19 +3,18 @@ clc; clear all; close all;
 %% CONFIGURATION
 
 resultExp2DirPath = "./result_classification_exp2";
-resultExp2For0xsecFileName = "result_classification_exp2_fs0Xsec.csv";
-resultExp2For1secFileName = "result_classification_exp2_fs1sec.csv";
+resultExp2For0xsecFileName = "result_classification_exp2_fs0Xsec.dat";
+resultExp2For1secFileName = "result_classification_exp2_fs1sec.dat";
 resultTTest = "ttest.txt";
 
 
 %% EXECUTION
 
-% loading csv results (first row is header)
-result0xsec = readmatrix(sprintf("%s/%s", resultExp2DirPath, resultExp2For0xsecFileName));
-result1sec = readmatrix(sprintf("%s/%s", resultExp2DirPath, resultExp2For1secFileName));
+result0xsecTable = readtable(sprintf("%s/%s", resultExp2DirPath, resultExp2For0xsecFileName));
+result1secTable = readtable(sprintf("%s/%s", resultExp2DirPath, resultExp2For1secFileName));
 
-result0xsecData = result0xsec(2:end,:);
-result1secData = result1sec(2:end,:);
+result0xsecData = result0xsecTable{:,:};
+result1secData = result1secTable{:,:};
 
 [h,p,ci,stats] = ttest(result0xsecData(:), result1secData(:));
 

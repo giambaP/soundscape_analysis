@@ -1,0 +1,44 @@
+[NOTA: puoi anche scrivere solo la parte di anomaly detection, se abbiamo qualche risultato)
+
+Sommario
+
+1. Introduzione.
+1a. pattern recognition e machine learning per l'analisi di soundscapes e in generale di audio per l'ecologia
+Sources:
+Introduzione di: 
+Quinn, Colin A., et al. "Soundscape classification with convolutional neural networks reveals temporal and geographic patterns in ecoacoustic data." Ecological Indicators 138 (2022): 108831.
+
+Farina, Almo, et al. "Sonotopes reveal dynamic spatio-temporal patterns in a rural landscape of Northern Italy." Frontiers in Ecology and Evolution 11 (2023): 1205272.
+
+1b. obiettivo della tesi: classificazione e analisi preliminare di anomaly detection
+
+
+2. Background: tutti i concetti che hai usato (in generale, senza parlare del problema specifico)
+Breve descrizione di:
+- spettrogramma
+- features usate
+- filtraggio
+- classificazione
+- anomaly detection: cosa vuol dire, in breve quelli usati
+
+
+3. Il dataset utilizzato: descrizione, qualche plot, etc etc
+
+4. Classificazione
+Descrizione degli esperimenti:
+- configurazioni di features utilizzate, dettagli del classificatore usato (Nearest Neighbor)
+- problemi di classificazione disegnati (day vs Night, etc etc)
+- Risultati (errori ottenuti)
+
+5. Anomaly detection
+- Descrizione degli esperimenti: 
+- configurazioni di features e metodi
+- Validazione dei risultati: come abbiamo fatto
+- Risultati
+
+6. Conclusioni
+
+
+
+
+

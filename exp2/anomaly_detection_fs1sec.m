@@ -140,7 +140,7 @@ function commonValues = multiIntersect(arrays)
 end
 
 %% MULTITHREADING
-%{
+%
 ticWorkers = tic;
 fprintf("> try to init workers \n");
 % overriding workers
@@ -325,13 +325,13 @@ conf.topScoresCount = 10;
 
 featIdxs = getFeaturesIdx(featSize);
 
-fprintf("\n--- SEARCHING ANOMALIES NORMAL ------------------------\n");
-writeAnomalies(0, sampleRate, audioData, data, featuresMean, featuresCount, featSize, featIdxs, stdOff, conf);
-fprintf("\n--- SEARCHING ANOMALIES WITH STANDARDIZATION ----------\n");
-writeAnomalies(0, sampleRate, audioData, data, featuresMean, featuresCount, featSize, featIdxs, stdOn, conf);
+% fprintf("\n--- SEARCHING ANOMALIES NORMAL ------------------------\n");
+% writeAnomalies(0, sampleRate, audioData, data, featuresMean, featuresCount, featSize, featIdxs, stdOff, conf);
+% fprintf("\n--- SEARCHING ANOMALIES WITH STANDARDIZATION ----------\n");
+% writeAnomalies(0, sampleRate, audioData, data, featuresMean, featuresCount, featSize, featIdxs, stdOn, conf);
 
 
-%  -------   SUBSET DATA yat1, march, h 2, 6, 10, 14, 18, 22, mm 00  -----------------------------
+%  -------   SUBSET DATA yat1, march, h 2, 6, 10, 14, 18, 22, mm 00  test -----------------------------
 
 % test1 yat1,march,2/6/10/14/18/22,00
 uniqueNameColumn = AudioDataColumnIndex.UniqueName.index;
@@ -358,20 +358,21 @@ featuresMean = calcFeaturesMean(dataFiltered, featuresCount);
 audioDataFiltered = audioData(filteredYat1Idxs , :);
 
 conf.executionCount = 30;
-conf.topScoresCount = size(filteredYat1Idxs, 1);
-conf.resultFilePath = sprintf("%s/anomalies_result_%s_top_scores_filtered.csv", anomalousAudioDir, sampleRate);
+conf.topScoresCount = 3;
+conf.resultFilePath = sprintf("%s/anomalies_detection_result_%s_all_features_all_algo.csv", anomalousAudioDir, sampleRate);
 delete(conf.resultFilePath);
 
 dataType = "zscore";
 standardize = stdOn;
-% execIforest(sampleRate, sprintf("conc avg feat all (%)", dataType), audioDataFiltered, featuresMean(:,1:(featuresCount)), standardize, conf);
-% execLocalOutlierFactor(sampleRate, sprintf("conc avg feat all (%s)", dataType), audioDataFiltered, featuresMean(:,1:(featuresCount)), standardize, conf);
-% execOcsvm(sampleRate, sprintf("conc avg feat all (%s)", dataType), audioDataFiltered, featuresMean(:,1:(featuresCount)), standardize, conf);
+writeAnomalies(0, sampleRate, audioDataFiltered, dataFiltered, featuresMean, featuresCount, featSize, featIdxs, stdOff, conf);
+writeAnomalies(1, sampleRate, audioDataFiltered, dataFiltered, featuresMean, featuresCount, featSize, featIdxs, stdOff, conf);
+writeAnomalies(2, sampleRate, audioDataFiltered, dataFiltered, featuresMean, featuresCount, featSize, featIdxs, stdOff, conf);
 
 
 % TEST 2: prendere un audio veicolo e altri che non lo presentano per
 % vedere se viene rilevato come anomalia
-dataSounds = readtable(sprintf("%s/anomalies_sounds.dat", anomalousAudioDir));
+%{
+dataSounds = readtable(".labels/audio_data_identified_with_labels.dat");
 idxsVehicle = find(dataSounds.vehicle == 1);
 idxsNoVehicle = setdiff(1:size(dataSounds.vehicle,1), find(dataSounds.vehicle == 1));
 
@@ -394,7 +395,7 @@ for i = 1:length(idxsVehicle)
         end
     end
 end
-
+%}
 
 
 disp("> EXECUTION COMPLETE");
@@ -402,8 +403,8 @@ disp("> EXECUTION COMPLETE");
 
 
 %% CHARTS
-%
-dataSounds = readtable(sprintf("%s/anomalies_sounds.dat", anomalousAudioDir));
+%{
+dataSounds = readtable(sprintf("./%s/audio_data_identified_with_labels.dat", labelsDir));
 
 allSounds = [dataSounds.vehicle, dataSounds.birds, dataSounds.crickets, dataSounds.river_waterfall, dataSounds.rain, dataSounds.thunder, dataSounds.noise, dataSounds.unknown];
 time = datetime(dataSounds.year, dataSounds.month, dataSounds.day, dataSounds.hours, dataSounds.minutes, dataSounds.seconds);

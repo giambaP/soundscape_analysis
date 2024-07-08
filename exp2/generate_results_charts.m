@@ -289,10 +289,12 @@ labels = strcat("UPP ", num2str(upperFilter'), " - LOW ", num2str(lowerFilter'))
 bestFiltersData0XfsNoFiltersRows = resultBestFilter0XfsData(3:end, :);
 bestFiltersData1fsNoFiltersRows = resultBestFilter1fsData(3:end, :);
 % dividing between normal (row 1:19) and standardized(20:38)
-bestFiltersData0XfsNormal = bestFiltersData0XfsNoFiltersRows(1:19, :);
-bestFiltersData0XfsStd = bestFiltersData0XfsNoFiltersRows(20:38, :);
-bestFiltersData1fsNormal = bestFiltersData1fsNoFiltersRows(1:19, :);
-bestFiltersData1fsStd = bestFiltersData1fsNoFiltersRows(20:38, :);
+normalRange = 1:19;
+stdData = 20:38;
+bestFiltersData0XfsNormal = bestFiltersData0XfsNoFiltersRows(normalRange, :);
+bestFiltersData0XfsStd = bestFiltersData0XfsNoFiltersRows(stdData, :);
+bestFiltersData1fsNormal = bestFiltersData1fsNoFiltersRows(normalRange, :);
+bestFiltersData1fsStd = bestFiltersData1fsNoFiltersRows(stdData, :);
 
 result0XfsNormalMean = mean(bestFiltersData0XfsNormal, 1);
 result0XfsStdMean = mean(bestFiltersData0XfsStd, 1);

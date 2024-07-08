@@ -3,12 +3,12 @@
 Sommario
 
 1. Introduzione.
+
 1a. pattern recognition e machine learning per l'analisi di soundscapes e in generale di audio per l'ecologia
 Sources:
 Introduzione di: 
-Quinn, Colin A., et al. "Soundscape classification with convolutional neural networks reveals temporal and geographic patterns in ecoacoustic data." Ecological Indicators 138 (2022): 108831.
-
-Farina, Almo, et al. "Sonotopes reveal dynamic spatio-temporal patterns in a rural landscape of Northern Italy." Frontiers in Ecology and Evolution 11 (2023): 1205272.
+-Quinn, Colin A., et al. "Soundscape classification with convolutional neural networks reveals temporal and geographic patterns in ecoacoustic data." Ecological Indicators 138 (2022): 108831.
+-Farina, Almo, et al. "Sonotopes reveal dynamic spatio-temporal patterns in a rural landscape of Northern Italy." Frontiers in Ecology and Evolution 11 (2023): 1205272.
 
 1b. obiettivo della tesi: classificazione e analisi preliminare di anomaly detection
 
@@ -16,10 +16,10 @@ Farina, Almo, et al. "Sonotopes reveal dynamic spatio-temporal patterns in a rur
 2. Background: tutti i concetti che hai usato (in generale, senza parlare del problema specifico)
 Breve descrizione di:
 - spettrogramma
-- features usate
+- features usate (1 pagina max)
 - filtraggio
 - classificazione
-- anomaly detection: cosa vuol dire, in breve quelli usati
+- anomaly detection: cosa vuol dire, in breve algoritmi quelli usati
 
 
 3. Il dataset utilizzato: descrizione, qualche plot, etc etc

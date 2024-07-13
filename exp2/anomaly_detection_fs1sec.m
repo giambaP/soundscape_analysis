@@ -363,10 +363,15 @@ conf.resultFilePath = sprintf("%s/anomalies_detection_result_%s_all_features_all
 delete(conf.resultFilePath);
 
 dataType = "zscore";
-standardize = stdOn;
+% iforest std off/on
 writeAnomalies(0, sampleRate, audioDataFiltered, dataFiltered, featuresMean, featuresCount, featSize, featIdxs, stdOff, conf);
+writeAnomalies(0, sampleRate, audioDataFiltered, dataFiltered, featuresMean, featuresCount, featSize, featIdxs, stdOn, conf);
+% lof std off/on
 writeAnomalies(1, sampleRate, audioDataFiltered, dataFiltered, featuresMean, featuresCount, featSize, featIdxs, stdOff, conf);
+writeAnomalies(1, sampleRate, audioDataFiltered, dataFiltered, featuresMean, featuresCount, featSize, featIdxs, stdOn, conf);
+% ocssm std off/on
 writeAnomalies(2, sampleRate, audioDataFiltered, dataFiltered, featuresMean, featuresCount, featSize, featIdxs, stdOff, conf);
+writeAnomalies(2, sampleRate, audioDataFiltered, dataFiltered, featuresMean, featuresCount, featSize, featIdxs, stdOn, conf);
 
 
 % TEST 2: prendere un audio veicolo e altri che non lo presentano per

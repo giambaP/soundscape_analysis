@@ -8,6 +8,10 @@ resultExp2DirPath = "./result_classification_exp2";
 resultExp2For0XfsFileName = "result_classification_exp2_fs0Xsec.dat";
 resultExp2For1fsFileName = "result_classification_exp2_fs1sec.dat";
 
+resultExp2IdentSoundDirPath = "./result_classification_exp2_identified_sound";
+resultExp2IdentSoundFor0XfsFileName = "result_classification_exp2_identified_sound_fs0Xsec.dat";
+resultExp2IdentSoundFor1fsFileName = "result_classification_exp2_identified_sound_fs1sec.dat";
+
 resultBestFilters0XfsDirPath = "./result_best_filters_0Xsec";
 resultBestFilters1fsDirPath = "./result_best_filters_1sec";
 bestFilter0XfsFileName = "result_best_filters_0Xsec_all.csv";
@@ -44,12 +48,22 @@ groupsLabels = [
     "Month", ...
     "Half Month"
     ];
+groupsLabelsIdentifiedSound = [
+    "Vehicle", ...
+    "Crickets", ...
+    "Rain", ...
+    "Thunder"
+    ];
+
+[f, g] = meshgrid(fsWindowTypes, dataStatus);
+fsWindowTypesWithDataStatus = strcat(f(:), " - ", g(:));
 
 [f, g] = meshgrid(groupsLabels, dataStatus);
 groupLabelsWithDataTypes = strcat(f(:), " - ", g(:));
 
-[f, g] = meshgrid(fsWindowTypes, dataStatus);
-fsWindowTypesWithDataStatus = strcat(f(:), " - ", g(:));
+[f, g] = meshgrid(groupsLabelsIdentifiedSound, dataStatus);
+groupLabelsIdentifiedSoundWithDataTypes = strcat(f(:), " - ", g(:));
+
 
 %% FUNCTION
 
@@ -67,6 +81,12 @@ result0XfsTable = readtable(sprintf("%s/%s", resultExp2DirPath, resultExp2For0Xf
 result1fsTable = readtable(sprintf("%s/%s", resultExp2DirPath, resultExp2For1fsFileName));
 result0XfsData = result0XfsTable{:,:};
 result1fsData = result1fsTable{:,:};
+
+% classification data
+result0XfsTable = readtable(sprintf("%s/%s", resultExp2IdentSoundDirPath, resultExp2IdentSoundFor0XfsFileName));
+result1fsTable = readtable(sprintf("%s/%s", resultExp2IdentSoundDirPath, resultExp2IdentSoundFor1fsFileName));
+result0XfsIdentSoundData = result0XfsTable{:,:};
+result1fsIdentSoundData = result1fsTable{:,:};
 
 % classification with filter data
 resultBestFilter0XfsTable = readtable(sprintf("%s/%s", resultBestFilters0XfsDirPath, bestFilter0XfsFileName));
@@ -278,8 +298,8 @@ saveas(fig,sprintf('%s/chart_classif_avg_error_per_label_type_mean_bar.jpg', cha
 
 
 
-%% SEACH BEST FILTER: AVG ERROR BY FILTER ORDER BY LOWER - PLOT
-%
+%% SEARCH BEST FILTER: AVG ERROR BY FILTER ORDER BY LOWER - PLOT
+%{
 % retrieving labels 
 upperFilter = resultBestFilter0XfsData(1, :);
 lowerFilter = resultBestFilter0XfsData(2, :);
@@ -319,8 +339,8 @@ hold off;
 saveas(fig,sprintf('%s/chart_best_filter_avg_error_per_feature_order_by_lower_plot.jpg', chartsDir));
 %}
 
-%% SEACH BEST FILTER: AVG ERROR BY FILTER ORDER BY UPPER - PLOT
-%
+%% SEARCH BEST FILTER: AVG ERROR BY FILTER ORDER BY UPPER - PLOT
+%{
 % retrieving labels 
 upperFilter = resultBestFilter0XfsData(1, :);
 lowerFilter = resultBestFilter0XfsData(2, :);
@@ -363,4 +383,52 @@ legend(fsWindowTypesWithDataStatus, 'Location', 'bestoutside');
 grid on;
 hold off;
 saveas(fig,sprintf('%s/chart_best_filter_avg_error_per_feature_order_by_upper_plot.jpg', chartsDir));
+%}
+
+%% CLASSIFICATION IDENTIFIED SOUND: AVG ERROR BY FEATURE - BAR
+%
+result0XfsMean = mean(result0XfsIdentSoundData, 2);
+result1fsMean = mean(result1fsIdentSoundData, 2);
+objects = 1:size(result0XfsIdentSoundData, 1);
+
+fig = figure;
+hold on;
+
+bar([result0XfsMean(:),result1fsMean(:)]);
+
+title('LOO KNN - Average % results by feature - bar');
+xlabel('Features');
+ylabel('Avg % Error');
+
+ylim( calcLimit(result0XfsMean, result1fsMean, 0.01) );
+set(gca, 'XTick', objects, 'XTickLabel', featuresLabels, 'FontSize', 7);
+xtickangle(40);
+legend(fsWindowTypes, 'Location', 'northeastoutside');
+grid on;
+hold off;
+saveas(fig,sprintf('%s/chart_classif_avg_error_per_feature_bar_identified_sound.jpg', chartsDir));
+%}
+
+%% CLASSIFICATION: AVG ERROR BY LABEL TYPE - BAR GROUPS COMPACT
+%
+result0XfsMean = mean(result0XfsIdentSoundData, 1);
+result1fsMean = mean(result1fsIdentSoundData, 1);
+objects = 1:size(result0XfsIdentSoundData, 2);
+
+fig = figure;
+hold on;
+
+bar(horzcat(reshape(result0XfsMean, 2, [])', reshape(result1fsMean, 2, [])'));
+
+title('LOO KNN - Average % errors by label type - bar small');
+xlabel('Group Labels');
+ylabel('Avg % Error');
+
+ylim( calcLimit(result0XfsMean, result1fsMean, 0.01) );
+set(gca, 'XTick', objects, 'XTickLabel', groupsLabelsIdentifiedSound);
+xtickangle(40);
+legend(fsWindowTypesWithDataStatus, 'Location', 'northeastoutside', 'FontSize', 7);
+grid on;
+hold off;
+saveas(fig,sprintf('%s/chart_classif_avg_error_per_label_type_small_bar_identified_sound.jpg', chartsDir));
 %}

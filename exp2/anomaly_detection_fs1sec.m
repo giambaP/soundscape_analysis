@@ -4,13 +4,13 @@ clc; close all; clear all;
 
 featuresCount = 11;
 featSize = 120;
-sampleRate = "fs1";
+sampleRate = "fs1s";
 
 audioDir = "../downloadAllAudible/datasetAll";
 labelsDir = './labels';
 anomalousAudioDir = "./anomalousAudioData";
 anomalousAudioResultDir = sprintf("./%s/result", anomalousAudioDir);
-templatesDirPath = sprintf("./templates_%ss", sampleRate);
+templatesDirPath = sprintf("./templates_%s", sampleRate);
 matrixFeaturesName = "matrixAllFeatures.mat";
 
 threadsCount = 8;
@@ -303,7 +303,7 @@ function writeAnomalies(algoType, sampleRate, audioData, data, featuresMean, fea
 
     writeAnomaliesInFile(algoType, sampleRate, "conc feat all (" + dataType + ")", audioData, data(:,featIdxs.allFeaturesIdxs), standardize, conf);
     writeAnomaliesInFile(algoType, sampleRate, "conc feat spectral (" + dataType + ")", audioData, data(:,featIdxs.featuresSpectralIdxs), standardize, conf);
-    writeAnomaliesInFile(algoType, sampleRate, "conc feat spectral (" + dataType + ")", audioData, data(:,featIdxs.featuresTonalessIdxs), standardize, conf);
+    writeAnomaliesInFile(algoType, sampleRate, "conc feat tonaless (" + dataType + ")", audioData, data(:,featIdxs.featuresTonalessIdxs), standardize, conf);
     writeAnomaliesInFile(algoType, sampleRate, "conc feat time (" + dataType + ")", audioData, data(:,featIdxs.featuresTimeIdxs), standardize, conf);
     writeAnomaliesInFile(algoType, sampleRate, "conc avg feat all (" + dataType + ")", audioData, featuresMean(:,1:(featuresCount)), standardize, conf);
     writeAnomaliesInFile(algoType, sampleRate, "conc avg feat spectral (" + dataType + ")", audioData, featuresMean(:,featIdxs.featuresAvgSpectralIdxs), standardize, conf);

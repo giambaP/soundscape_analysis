@@ -24,6 +24,7 @@ labels = labels(1:objsCount,1);
 featSize = elementsPerFeature;
 allFeaturesIdxs = 1:(featSize*11);
 
+% features indexes
 spectralCentroidIdxs = 1:featSize;
 spectralCrestFactorIdxs = (featSize*1+1):(featSize*2);
 spectralDecreaseIdxs = (featSize*2+1):(featSize*3);
@@ -40,6 +41,10 @@ featuresSpectralIdxs = [spectralCentroidIdxs, spectralDecreaseIdxs, spectralFlux
 featuresTonalessIdxs = [spectralCrestFactorIdxs, spectralFlatnessIdxs, spectralTonalPowerRatioIdxs];
 featuresTimeIdxs = [timeZeroCrossingRateIdxs, timeAcfCoeffIdxs, timeMaxAcfIdxs];
 
+featuresAvgSpectralIdxs = [1, 3, 5, 6, 7];
+featuresAvgTonalessIdxs = [2, 4, 8];
+featuresAvgTimeIdxs = [9, 10, 11];
+
 % average features
 featuresMean = zeros(objsCount, 11);
 for j = 1 : objsCount
@@ -49,22 +54,18 @@ for j = 1 : objsCount
 end
 console(printExecution, "> mean completed\n");
 
-featuresAvgSpectralIdxs = [1, 3, 5, 6, 7];
-featuresAvgTonalessIdxs = [2, 4, 8];
-featuresAvgTimeIdxs = [9, 10, 11];
 
-
-    function str = getStd(st)
-        str = "normal";
-        if (st == 1)
-            str = "std";
-        end
+function str = getStd(st)
+    str = "normal";
+    if (st == 1)
+        str = "std";
     end
-    function console(printExecution, varargin)
-        if printExecution
-            console(printExecution, varargin{:});
-        end
+end
+function console(printExecution, varargin)
+    if printExecution
+        fprintf(printExecution, varargin{:});
     end
+end
 
 % 19 calc * 2: orig and std -> label, error, standardization on/off
 results = cell(19*2, 3);

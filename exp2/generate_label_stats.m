@@ -4,14 +4,9 @@ sourceDir = './labels/';
 targetDir = './labels/';
 
 matrixFileName = "audio_data.mat";
-labelsYatFileName = "labelsYAT.mat";
-labelsDNFileName = "labelsDN.mat";
 
 audioMatrixDataPath = sprintf("%s%s", sourceDir, matrixFileName);
-
-if ~exist(targetDir, "dir")
-    fprintf('>> target dir not exists, check "%s"\n', targetDir);
-elseif ~exist(audioMatrixDataPath, "file")
+if ~exist(audioMatrixDataPath, "file")
     fprintf('>> audio file name matrix not exists, name "%s"\n', matrixFileName);
 end
 
@@ -34,7 +29,10 @@ load(audioMatrixDataPath);
 
 % column yat
 labelsYAT = cell2mat(audioData(:, yatColumn));
-save(sprintf("%s/labels_Yat.mat", targetDir), "-fromstruct", struct("labels", labelsYAT));
+
+[count, groupNames] = groupcounts(labelsYAT);
+disp(" ");
+disp(table(groupNames, count, 'VariableNames', ["YAT TYPE", "Count"]));
 
 %% DAY / NIGHT
 
@@ -42,17 +40,25 @@ save(sprintf("%s/labels_Yat.mat", targetDir), "-fromstruct", struct("labels", la
 hoursColumnData = cell2mat(audioData(:, hourColumn));
 dayTimeRowsIndx = hoursColumnData >= 6 & hoursColumnData <= 17;
 lablesDayNight = zeros(size(hoursColumnData, 1), 1);
-lablesDayNight(dayTimeRowsIndx) = 1;
-save(sprintf("%s/labels_DayNight.mat", targetDir), "-fromstruct", struct("labels", lablesDayNight));
+lablesDayNight(dayTimeRowsIndx) = 1; % night 0,  day 1
 
-%% SUNRISE / SUNSET
+[count, ~] = groupcounts(lablesDayNight);
+disp(" ");
+disp(table(["Night", "Day"]', count, 'VariableNames', ["D/N TYPE", "Count"]));
+
+%% SUNRISE / SUNSET ( with the rest of day)
 
 % filtering hour column, 2 classes, sunrise 5-6-7 and sunset 18-19-20 from
 % the rest of the day
 hoursColumnData = cell2mat(audioData(:, hourColumn));
 hourValues = [5, 6, 7, 18, 19, 20];
 labelsSunriseSunset = ismember(hoursColumnData, hourValues);
-save(sprintf("%s/labels_SunriseSunset.mat", targetDir), "-fromstruct", struct("labels", labelsSunriseSunset));
+% sr/ss 1, rest 0
+
+[count, ~] = groupcounts(labelsSunriseSunset);
+disp(" ");
+disp(table(["Rest of day", "Sunrise/sunset"]', count, 'VariableNames', ["(SR|SS)/rest of day", "Count"]));
+
 
 %% SUNRISE / SUNSET / DAY / NIGHT
 
@@ -68,13 +74,20 @@ labelsSunriseSunsetDayNight(ismember(hoursColumnData, sunRiseValues) == 1) = 1;
 labelsSunriseSunsetDayNight(ismember(hoursColumnData, dayValues) == 1) = 2;
 labelsSunriseSunsetDayNight(ismember(hoursColumnData, sunSetValues) == 1) = 3;
 labelsSunriseSunsetDayNight(ismember(hoursColumnData, nightValues) == 1) = 4;
-save(sprintf("%s/labels_SunriseSunsetDayNight.mat", targetDir), "-fromstruct", struct("labels", labelsSunriseSunsetDayNight));
+
+[count, groupNames] = groupcounts(labelsSunriseSunsetDayNight);
+disp(" ");
+disp(table(["Sunrise", "Day", "Sunset", "Night"]', count, 'VariableNames', ["Sunrise/Sunset/Day/Night", "Count"]));
 
 %% MONTH
 
 % column month
 labelMonth = cell2mat(audioData(:, monthColumn));
-save(sprintf("%s/labels_Month.mat", targetDir), "-fromstruct", struct("labels", labelMonth));
+
+[count, groupNames] = groupcounts(labelMonth);
+disp(" ");
+disp(table(["March", "April", "May"]', count, 'VariableNames', ["Month", "Count"]));
+
 
 %% HALF MONTH
 
@@ -82,23 +95,7 @@ save(sprintf("%s/labels_Month.mat", targetDir), "-fromstruct", struct("labels", 
 dayColumnData = cell2mat(audioData(:, dayColumn));
 halfMonthDaysValues = 1:15;
 labelsHalfMonth = ismember(dayColumnData, halfMonthDaysValues);
-save(sprintf("%s/labels_HalfMonth.mat", targetDir), "-fromstruct", struct("labels", labelsHalfMonth));
 
-
-%% FINAL CHECKS FOR ALL LABELS
-
-rangeData = [1:20,600:620,2000:2030,4000:5015,8030:8045];
-
-yatData = cell2mat(audioData(:, yatColumn));
-monthData = cell2mat(audioData(:, monthColumn));
-dayData = cell2mat(audioData(:, dayColumn));
-hourData = cell2mat(audioData(:, hourColumn));
-
-disp(table(yatData(rangeData), labelsYAT(rangeData), 'VariableNames', ["Yat", "LabelYat"]));
-disp("\n");
-disp(table(monthData(rangeData), labelMonth(rangeData), 'VariableNames', ["Month", "LabelMonth"]));
-disp("\n");
-disp(table(dayData(rangeData), labelsHalfMonth(rangeData), 'VariableNames', ["Day", "HalfMonth"]));
-disp("\n");
-disp(table(hourData(rangeData), lablesDayNight(rangeData), labelsSunriseSunset(rangeData), labelsSunriseSunsetDayNight(rangeData), ...
-    'VariableNames', ["Hours", "LabelDay/Night", "LabelSunrise/Sunset", "LabelSunrise/Sunset/Day/Night"]));
+[count, groupNames] = groupcounts(labelsHalfMonth);
+disp(" ");
+disp(table(["First half", "Second Half"]', count, 'VariableNames', ["Half Month", "Count"]));

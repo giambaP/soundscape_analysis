@@ -31,7 +31,7 @@ Descrizione degli esperimenti:
 - Risultati (errori ottenuti)
 
 5. Anomaly detection
-- Descrizione degli esperimenti: 
+Descrizione degli esperimenti: 
 - configurazioni di features e metodi
 - Validazione dei risultati: come abbiamo fatto
 - Risultati

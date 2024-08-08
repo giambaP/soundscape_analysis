@@ -20,10 +20,10 @@ dirResult = 'result_loonn';
 if ~exist(dirResult, 'dir')
     mkdir(dirResult);
 end
-resultFile = sprintf("./%s/%s_%s", dirResult, dirData, labelFileName);
-if exist(resultFile, 'file')
-    fprintf("loonn skipped for %s in %s\n",dirData, labelFileName);
-else
+% resultFile = sprintf("./%s/%s_%s", dirResult, dirData, labelFileName);
+% if exist(resultFile, 'file')
+%     fprintf("loonn skipped for %s in %s\n",dirData, labelFileName);
+% else
     tic;
 
     dataFilePath = sprintf("./%s/%s", dirData, dataFileName);
@@ -42,7 +42,7 @@ else
     save(resultFile, '-fromstruct', struct('results', resultTypes', 'values', values', 'isStandardized', isStandardized'));
 
     toc;
-end
+% end
 results = load(resultFile);
 end
 

@@ -56,18 +56,18 @@ fprintf("> execution start \n");
 fprintf("> parallel threads %d \n", threadsCount);
 
 % workers
-ticWorkers = tic;
-fprintf("> try to init workers \n");
-% overriding workers
-localCluster = parcluster('local');
-localCluster.NumWorkers = threadsCount;
-saveProfile(localCluster);
-% removing existent pool
-pool = gcp('nocreate');
-if ~isempty(pool); delete(pool); delete(localCluster.Jobs); end
-parpool('local', threadsCount);
-elapsed = toc(ticWorkers);
-fprintf('> startup %d workers in %.4f sec\n', threadsCount, elapsed);
+% ticWorkers = tic;
+% fprintf("> try to init workers \n");
+% % overriding workers
+% localCluster = parcluster('local');
+% localCluster.NumWorkers = threadsCount;
+% saveProfile(localCluster);
+% % removing existent pool
+% pool = gcp('nocreate');
+% if ~isempty(pool); delete(pool); delete(localCluster.Jobs); end
+% parpool('local', threadsCount);
+% elapsed = toc(ticWorkers);
+% fprintf('> startup %d workers in %.4f sec\n', threadsCount, elapsed);
 
 ticStart = tic;
 
@@ -114,7 +114,7 @@ for lowerFilter = lowerFilters
         featureTimeAcfCoeff = zeros(filesCount, elementsPerFeature);
         featureTimeMaxAcf = zeros(filesCount, elementsPerFeature);
 
-        parfor fileId = 1:filesCount
+        for fileId = 1:filesCount
             uniqueName = audioData{fileId, 1};
             audioName = audioData{fileId, 2};
             audioNameNoExtension = audioData{fileId, 3};

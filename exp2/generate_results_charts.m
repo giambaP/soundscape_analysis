@@ -310,7 +310,7 @@ dataSounds = readtable(sprintf("./%s/audio_data_identified_with_labels.dat", lab
 
 % percentage of sound for each hour
 allSounds = [dataSounds.vehicle, dataSounds.birds, dataSounds.crickets, dataSounds.river_waterfall, dataSounds.rain, dataSounds.thunder, dataSounds.noise, dataSounds.unknown];
-soundColumns = {'Veicolo', 'Uccelli', 'Grilli', 'Fiume/Cascata', 'Pioggia', 'Tuono', 'Interferenza', 'Non identificato'};
+soundColumns = {'veicoli V', 'uccelli U', 'grilli G', 'fiume/cascata C', 'pioggia P', 'tuono T', 'interferenza I', 'non identificato S'};
 numSounds = length(soundColumns);
 
 time = datetime(dataSounds.year, dataSounds.month, dataSounds.day, dataSounds.hours, dataSounds.minutes, dataSounds.seconds);

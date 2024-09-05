@@ -6,7 +6,7 @@ addpath("functions/");
 audioDir = "../downloadAllAudible/datasetAll";
 labelsDir = './labels';
 resultDir = './result_best_filters_1sec';
-resultFileName = 'result_best_filters_1sec';
+resultFileName = 'result_best_filters_1sec.test2';
 
 % spectrogram conf
 iBlockLength = 48000;
@@ -74,8 +74,8 @@ ticStart = tic;
 
 %% filtering, concatenation and LOON execution for each filter
 
-upperFilters = [ 20 30 40 ]; %0:5:15;
-lowerFilters = [ 20 30 40 ]; %0:5:15;
+upperFilters = [ 1000:1000:6000 ]; 
+lowerFilters = [ 1000:1000:6000 ]; 
 filtersCount = numel(upperFilters) * numel(lowerFilters);
 
 % LOONN result
@@ -86,6 +86,7 @@ resultsCols = 1+1+filtersCount;
 results = cell(resultsRows, resultsCols);
 
 firstResult = 1;
+indexWhenPrintStatus = 30;
 
 filterIndex = 0;
 for lowerFilter = lowerFilters
@@ -149,7 +150,7 @@ for lowerFilter = lowerFilters
             featureTimeAcfCoeff(fileId,:) = FeatureTimeAcfCoeff(y, iBlockLength, iHopLength, f_s);
             featureTimeMaxAcf(fileId,:) = FeatureTimeMaxAcf(y, iBlockLength, iHopLength, f_s);
             
-            if mod(fileId, 30) == 0 % some of thread could reach it but real status could be a little bit different
+            if mod(fileId, indexWhenPrintStatus) == 0 % some of thread could reach it but real status could be a little bit different
                 elapsed = toc(ticFiltering);
                 fprintf('%s - [%3d] fileId reached at %s, elapsed time %.3f (%.2f min)\n', ...
                     filterId, fileId, char(datetime('now')), elapsed, elapsed/60);            

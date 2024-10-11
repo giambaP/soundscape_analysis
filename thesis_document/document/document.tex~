@@ -1,0 +1,46 @@
+\documentclass[12pt,a4paper,twoside]{report} % prima era 'book'
+
+\usepackage[T1]{fontenc}   
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+% interline
+%\renewcommand{\baselinestretch}{1.5} 
+\usepackage{setspace}
+\onehalfspacing % interlinea 1.5
+% page geom
+\usepackage{geometry}
+\geometry{
+	a4paper,
+	left=2.54cm,
+	right=2.54cm,
+	top=2.54cm,
+	bottom=2.54cm,
+	heightrounded, %indica fronte retro con rientranza
+	bindingoffset=5mm
+}
+
+\begin{document}
+	
+	\input{0.frontespizio/frontespizio}
+	
+	\clearpage
+	\thispagestyle{empty}
+		
+	\tableofcontents 
+	\thispagestyle{empty} % toglie numerazione alla pagina
+	
+	\input{1.capitolo1/capitolo1}
+	\input{2.capitolo2/capitolo2}
+	\input{3.capitolo3/capitolo3}
+	\input{4.capitolo4/capitolo4}
+	\input{5.capitolo5/capitolo5}
+	\input{6.capitolo6/capitolo6}
+	
+	\newpage
+	\input{7.bibliografia/bibliografia}
+	\thispagestyle{empty} % toglie numerazione alla pagina
+
+\end{document}

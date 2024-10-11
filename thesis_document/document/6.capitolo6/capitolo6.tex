@@ -1,0 +1,38 @@
+\chapter{Conclusione}
+In questo studio sono state applicate tecniche di \textit{Pattern Recognition} e \textit{Machine Learning} per
+caratterizzare mediante classificazione e \textit{anomaly detection} un \textit{soundscape}.
+
+Come è già noto nella letteratura sui \textit{soundscape}, il contesto dello studio presenta notevoli
+difficoltà intrinseche. Si deve tenere conto che lo stesso cervello umano, nonostante le sue
+straordinarie capacità, fatica a distinguere e classificare determinati suoni.
+
+Nell’analisi si è realizzato un sistema di classi e sono state studiate diverse \textit{features} per
+caratterizzare un \textit{soundscape} ottenuto da uno studio di monitoraggio passivo della Riserva
+Naturale Los Yátaros in Colombia. Si è proceduto in due fasi di classificazione mediante
+categorie oggettive (per esempio giorno/notte) nella prima e categorie semantiche nella seconda. Infine,
+sono stati è applicati algoritmi di \textit{anomaly detection} per individuare eventuali suoni anomali.
+
+Nella classificazione, in entrambe le fasi si è ottenuto che la \textit{feature} migliore consiste nella
+concatenazione delle medie dei gruppi di tipologie di \textit{features}, nella versione standardizzata e
+in combinazione con la dimensione della finestra più ampia. Tra i problemi con categorie
+oggettive la discriminazione sul luogo ha ottenuto risultati nettamente superiori rispetto al
+resto. Nelle casistiche con categorie semantiche i problemi binari con due classi distinte
+occupano la prima posizione distaccandosi di poco da quelli binari che discriminano la
+presenza/assenza della classe. I problemi a tre classi, essendo un contesto multi etichetta
+come nei precedenti casi ma dovendo discriminare più classi, hanno ottenuto risultati accettabili.
+Nel particolare caso dei binari le \textit{feature} spettrali hanno ottenuto risultati interessanti, per i
+ternari lo sono state quelle tonali.
+
+L’\textit{anomaly detection} non ha rilevato particolari elementi significativi e non è emerso nessuno
+schema particolare tra i dati. I suoni relativi a interferenze e a quelli sconosciuti non sono
+emersi come anomalie. I suoni relativi alla geofonia sono stati riscontrati frequentemente. Si
+è potuto notare che la presenza di dati anomali ricade nelle fasce orarie pomeridiane.
+Il tentativo di filtraggio sperimentato non ha portato nessun vantaggio dal punto di vista della
+qualità dell’audio, ma i risultati ottenuti sono comunque validi. La stessa combinazione di
+caratteristiche vincenti emerse dalla classificazione si sono mantenute tali anche rimuovendo
+parte delle frequenze.
+
+Noti i vantaggi derivati dalla comprensione dei \textit{soundscape}, si termina questo studio con la
+speranza che la ricerca possa avanzare e trovare soluzioni migliori per approfondire la
+conoscenza del nostro ecosistema.
+

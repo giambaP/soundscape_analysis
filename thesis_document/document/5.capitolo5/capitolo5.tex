@@ -1,0 +1,165 @@
+\chapter{Anomaly Detection}
+In questo capitolo si andrà ad esporre la terza fase dello studio, che si occupa di studiare
+algoritmi di A.D. per individuare eventuali suoni anomali. Nel contesto dei \textit{soundscape} gioca
+un ruolo molto interessante, per identificare suoni o eventi insoliti che potrebbero indicare
+cambiamenti ambientali, rumori estranei o fenomeni singolari: per esempio, la presenza di un
+cacciatore, oppure un animale non appartenente alla fauna del luogo. In questa analisi si è
+deciso di sperimentare l’utilizzo di tale metodologia applicando le conoscenze ottenute dalle
+fasi precedenti, per inferire informazioni ed esaminare quali elementi vengono classificati
+come anomali.
+
+\section{Configurazione \textit{features} e metodi}
+Nel seguente paragrafo saranno descritte le \textit{features} utilizzate in questo studio e le
+configurazioni dei metodi esposti nel paragrafo 2.3. Come menzionato sopra, la conoscenza
+ottenuta con lo studio di classificazione ci ha permesso di individuare \textit{feature} che riescono ad
+caratterizzare chiaramente il \textit{dataset}. Inoltre, dai risultati si è potuto verificare quale delle due
+finestre sia in grado di definire le caratteristiche più rilevanti. Si è quindi utilizzato il set di
+feature della versione FS1 di entrambe le forme di dati, per un totale di 38 \textit{features}, 19
+normali (FS1.NOR) e 19 standardizzate (FS1.STD).
+
+Per quanto riguarda i metodi, le versioni utilizzate presentano delle configurazioni
+considerabili come standard, quindi non sono state fatte particolari ottimizzazioni. IF utilizza
+100 alberi decisionali, un valore largamente utilizzato; la scelta di un numero maggiore
+potrebbe determinare una maggiore robustezza del modello, ma incrementa notevolmente
+anche il tempo di calcolo. Il numero di campionamenti presi per ogni albero è di 256
+elementi. Per LOF, invece, si è fissato per k (vicini) il valore di venti elementi, e come
+metrica di distanza, quella euclidea, già descritta precedentemente. Per l’algoritmo OCSVM,
+infine, si è utilizzato il kernel gaussiano. Il fattore di contaminazione, ovvero la soglia
+decisionale per definire quali elementi trattare come anomalie, è stato impostato a zero per
+tutti e tre gli algoritmi. Con tale valore il sistema non avendo una soglia definita per capire se
+un elemento è un'anomalia o meno, tratta tutti gli elementi come normali, assegnandogli solo
+un punteggio di anormalità. Si è deciso di non considerare il fattore di contaminazione dato
+che, nell’ambito dello studio è molto difficile definire una soglia a priori che possa definire l'anormalità. 
+Si è deciso di valutare invece gli elementi che con maggior frequenza risultano tra i punteggi più alti dei risultati delle
+configurazioni di \textit{features}.
+
+\section{Validazione dei risultati}
+In questo paragrafo verrà descritta la modalità di validazione per le tecniche A.D. nel
+contesto dello studio. Gli algoritmi sopra descritti fanno parte della tipologia di approcci non
+supervisionati, ovvero non necessitano quindi di etichette per poter funzionare. Per avere la
+validazione, è stato comunque impiegato il dataset DATA2, che è etichettato, così da potersi
+servire delle conoscenze sul contenuto per verificare il risultato.
+
+Le modalità di analisi prevedono trenta esecuzioni dell’algoritmo, calcolando la media dei
+punteggi di anomalia, in maniera tale da essere indipendenti dal valore della singola
+esecuzione. L’approccio viene replicato per ciascuna \textit{feature} (38, 19 normali e 19
+standardizzate), considerando poi solo i tre risultati con punteggio maggiore per feature,
+ottenendo un insieme totale di 38 x 3 risultati per ogni metodo. Per la valutazione del metodo
+sono state estratte le prime cinque occorrenze più numerose dai risultati del metodo. Per avere visione complessiva,
+invece, sono state estratte le prime cinque occorrenze più numerose considerando tutti e tre
+gli insiemi di risultati.
+
+\section{Risultati}
+Dopo aver esposto la modalità di applicazione dell’analisi si andrà a descrivere i risultati
+ottenuti. Nella tabella in figura 5.1 è possibile avere una visione dei risultati come descritti nel
+paragrafo precedente. I dati sono divisi in quattro gruppi definiti dalla prima colonna: i primi
+tre riguardano i risultati dei singoli metodi applicati ovvero IF, LOF e O, e il quarto i risultati
+sul totale. Per ognuno gruppo vengono esposti i primi cinque oggetti che hanno ottenuto più
+occorrenze. Nella seconda colonna si ha la descrizione dell’oggetto riscontrato come
+anomalia e nella terza colonna il numero di occorrenze rilevate all'interno del gruppo che identificano il file come anomalo. Nelle restanti colonne sono elencati i suoni presenti all’interno dell’audio riscontrato come
+anomalia. Per ogni gruppo viene indicato il relativo risultato percentuale della presenza sonora di un determinato suono all'interno del gruppo.
+
+Dal punto di vista dei singoli suoni, gli oggetti più anomali presentano: il rumore dei veicoli
+rilevato per un 40\% su IF e O, per un 60\% invece per L; il suono degli uccelli U che è sempre
+presente per un 60\% e con una distribuzione simile in tutte e tre le casistiche; il suono dei
+grilli G, che è emerso presente per un 40\% e solo in L; il suono del fiume/cascata C, che,
+come prevedibile, appare molto diffuso tra i risultati, ma si può ipotizzare che non abbia nulla
+di particolare e che la sua presenza sia dovuta unicamente alla sua ampia distribuzione nei
+dati; il suono della pioggia P che si è notevolmente osservato, per un 80\%, e si può affermare
+che valgono le stesse conclusione appena fatte per il caso precedente; infine, le interferenze e
+i suoni sconosciuti non sono stati rilevati come anomalie, contrariamente alle aspettative. Ci
+si poteva aspettare che sarebbero emersi data la loro minima presenza e particolarità, ma
+invece sono stati rilevati solo per un caso, e solo dal metodo O.
+
+Come è possibile notare, dalla prospettiva dei metodi, si vede che IF e O hanno espresso delle
+distribuzioni simili negli oggetti anomali rilevati nella BIO con il suono degli uccelli U per un
+60\% e nessun caso che contenesse dei grilli G, nella GEO con il suono di cascata C e pioggia
+P per un 80\% e infine nessuna presenza di interferenza. Invece, il metodo L ha dimostrato
+una sensibilità diversa, maggiore per il suono della cascata C, rilevata nel 100\% degli oggetti
+anomali, e una minore invece per la pioggia P per un 40\%.
+
+Invece, se si osserva dal punto di vista degli insiemi di suoni ANT/BIO/GEO, si può notare
+come la GEO sia molto presente, per almeno un 80\%. Per una parte si possono trarre le stesse
+conclusioni definite prima sulla distribuzione dei suoni C e P, ma per quanto riguarda quello
+di T, si può ipotizzare che non lo sia. Infatti, la sua distribuzione nel dataset di riferimento è
+di circa del 60\%, e la sua bilanciata presenza tra i risultati si può ritenere molto interessante.
+Similmente, per ANT e BIO è possibile sostenere l’ipotesi che il risultato ottenuto sia
+rilevante: per il primo sulla bassa numerosità dei dati in input, per il secondo invece, data la
+sua grande distribuzione, perché non si è propagato similmente a quanto osservato nei suoni
+più rilevati della GEO.
+
+Infine, da una prospettiva temporale, si manifesta che l’80\% dei risultati sul totale, ma anche
+nei singoli algoritmi, si concentra alle ore 14:00, nella seconda parte della giornata. Lo stesso
+per l’elemento identificato maggiormente come anomalia che risulta invece verso le ore
+18:00.
+
+%\begin{table}[ht]
+%	\centering
+%	\begin{tabular}{@{}lclcccccccc@{}}
+%		\toprule
+%		& \multicolumn{1}{l}{} &  & \multicolumn{1}{l}{\cellcolor[HTML]{FCEFEE}\textbf{ANT.}} & \multicolumn{2}{c}{\cellcolor[HTML]{9FE887}{\color[HTML]{000000} \textbf{BIO.}}} & \multicolumn{3}{c}{\cellcolor[HTML]{B0E4F3}\textbf{GEO.}} & \multicolumn{2}{c}{\cellcolor[HTML]{FFFFFF}\textbf{ALTRO}} \\ \cmidrule(l){4-11} 
+%		\textbf{Gruppo} & \multicolumn{1}{c}{\textbf{\# occ.}} & \multicolumn{1}{c}{\textbf{Audio}} & \textbf{V} & \textbf{U} & \textbf{G} & \textbf{C} & \textbf{P} & \textbf{F} & \textbf{I} & \textbf{S} \\ \midrule
+%		& 22 & 20200323\_180000.WAV & x & x &  & x & x &  &  &  \\
+%		& 18 & 20200303\_140000.WAV &  &  &  &  & x & x &  &  \\
+%		& 12 & 20200304\_140000.WAV &  &  &  & x & x & x &  &  \\
+%		& 8 & 20200309\_060000.WAV & x & x &  & x &  &  &  &  \\
+%		& 8 & 20200316\_220000.WAV &  & x &  & x & x &  &  &  \\ \cmidrule(l){2-11} 
+%		\multirow{-6}{*}{\textbf{IF}} & \multicolumn{2}{c}{\cellcolor[HTML]{EFEFEF}\textbf{RISULTATO \%}} & \cellcolor[HTML]{EFEFEF}\textbf{40} & \cellcolor[HTML]{EFEFEF}\textbf{60} & \cellcolor[HTML]{EFEFEF}\textbf{0} & \cellcolor[HTML]{EFEFEF}\textbf{80} & \cellcolor[HTML]{EFEFEF}\textbf{80} & \cellcolor[HTML]{EFEFEF}\textbf{40} & \cellcolor[HTML]{EFEFEF}\textbf{0} & \cellcolor[HTML]{EFEFEF}\textbf{0} \\ \midrule
+%		& 15 & 20200311\_140000.WAV &  &  &  & x & x & x &  &  \\
+%		& 15 & 20200323\_180000.WAV & x & x &  & x & x &  &  &  \\
+%		& 10 & 20200318\_140000.WAV & x & x &  & x &  &  &  &  \\
+%		& 9 & 20200301\_180000.WAV &  & x & x & x &  & x &  &  \\
+%		& 8 & 20200325\_020000.WAV & x &  & x & x &  &  &  &  \\ \cmidrule(l){2-11} 
+%		\multirow{-6}{*}{\textbf{LOF}} & \multicolumn{2}{c}{\cellcolor[HTML]{EFEFEF}\textbf{RISULTATO \%}} & \cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{60}} & \cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{60}} & \cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{40}} & \cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{100}} & \cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{40}} & \cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{40}} & \cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{0}} & \cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{0}} \\ \midrule
+%		& 6 & 20200323\_180000.WAV & x & x &  & x & x &  &  &  \\
+%		& 5 & 20200309\_060000.WAV & x & x &  & x &  &  &  &  \\
+%		& 4 & 20200314\_180000.WAV & x & x &  & x & x & x &  & x \\
+%		& 4 & 20200328\_140000.WAV &  &  &  & x & x & x &  &  \\
+%		& 3 & 20200303\_140000.WAV &  &  &  &  & x & x &  &  \\ \cmidrule(l){2-11} 
+%		\multirow{-6}{*}{\textbf{OCSVM}} & \multicolumn{2}{c}{\cellcolor[HTML]{EFEFEF}\textbf{RISULTATO \%}} & \cellcolor[HTML]{EFEFEF}\textbf{60} & \cellcolor[HTML]{EFEFEF}\textbf{60} & \cellcolor[HTML]{EFEFEF}\textbf{0} & \cellcolor[HTML]{EFEFEF}\textbf{80} & \cellcolor[HTML]{EFEFEF}\textbf{80} & \cellcolor[HTML]{EFEFEF}\textbf{80} & \cellcolor[HTML]{EFEFEF}\textbf{0} & \cellcolor[HTML]{EFEFEF}\textbf{20} \\ \midrule
+%		& 43 & 20200323\_180000.WAV & x & x &  &  & x &  &  &  \\
+%		& 25 & 20200303\_140000.WAV &  &  &  &  & x & x &  &  \\
+%		& 21 & 20200304\_140000.WAV &  &  &  & x & x & x &  &  \\
+%		& 18 & 20200311\_140000.WAV &  &  &  & x & x & x &  &  \\
+%		\multirow{-5}{*}{\textbf{TOTAL}} & 14 & 20200318\_140000.WAV & x & x &  & x &  &  &  &  \\ \midrule
+%		& \multicolumn{2}{c}{\cellcolor[HTML]{EFEFEF}\textbf{RISULTATO \%}} & \cellcolor[HTML]{EFEFEF}\textbf{40} & \cellcolor[HTML]{EFEFEF}\textbf{40} & \cellcolor[HTML]{EFEFEF}\textbf{0} & \cellcolor[HTML]{EFEFEF}\textbf{80} & \cellcolor[HTML]{EFEFEF}\textbf{80} & \cellcolor[HTML]{EFEFEF}\textbf{60} & \cellcolor[HTML]{EFEFEF}\textbf{0} & \cellcolor[HTML]{EFEFEF}\textbf{0} \\ \bottomrule
+%	\end{tabular}
+%	\caption{Risultati dell'\textit{anomaly detection} suddivisi dalla colonna gruppo i risultati dei tre metodi IF, LOF e OCSM, e per ultimo il risultato sull'insieme totale. La seconda colonna descrive il numero di occorrenzein ogni gruppo per il relativo audio, specificato nella terza colonna. Il nome dell'audio è composto dalla data (in formato anno con 4 cifre, il mese con 2 cifre e il giorno con 2 cifre), un separatore '\textit{\_}', l'ora (in formato ora 2 cifre e minuti 2 cifre) e infine l'estensione \textit{.WAV}.
+%		Per ogni audio nelle colonne successive sono indicati mediante una \textit{x} le classi di suoni che gli appartengono dei relativi insieme ANT/BIO/GEO e ALTRO per le interferenze I e i suoni sconosciuti S. }
+%	\label{fig:51}
+%\end{table}
+
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{@{}llccccccccc@{}}
+		\toprule
+		& \multicolumn{1}{l}{} &  & \multicolumn{1}{l}{\cellcolor[HTML]{FCEFEE}\textbf{ANT.}} & \multicolumn{2}{c}{\cellcolor[HTML]{9FE887}{\color[HTML]{000000} \textbf{BIO.}}} & \multicolumn{3}{c}{\cellcolor[HTML]{B0E4F3}\textbf{GEO.}} & \multicolumn{2}{c}{\cellcolor[HTML]{FFFFFF}\textbf{ALTRO}} \\ \cmidrule(l){4-11} 
+		\textbf{Gruppo} & \multicolumn{1}{c}{\textbf{Audio}} & \multicolumn{1}{c}{\textbf{\# occ.}} & \textbf{V} & \textbf{U} & \textbf{G} & \textbf{C} & \textbf{P} & \textbf{F} & \textbf{I} & \textbf{S} \\ \midrule
+		& 20200323\_180000.WAV & 22 & x & x &  & x & x &  &  &  \\
+		& 20200303\_140000.WAV & 18 &  &  &  &  & x & x &  &  \\
+		& 20200304\_140000.WAV & 12 &  &  &  & x & x & x &  &  \\
+		& 20200309\_060000.WAV & 8 & x & x &  & x &  &  &  &  \\
+		& 20200316\_220000.WAV & 8 &  & x &  & x & x &  &  &  \\ \cmidrule(l){2-11} 
+		\multirow{-6}{*}{\textbf{IF}} & \multicolumn{2}{c}{\cellcolor[HTML]{EFEFEF}\textbf{RISULTATO \%}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{40}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{60}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{0}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{80}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{80}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{40}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{0}} & \multicolumn{1}{r}{\cellcolor[HTML]{EFEFEF}\textbf{0}} \\ \midrule
+		& 20200311\_140000.WAV & 15 &  &  &  & x & x & x &  &  \\
+		& 20200323\_180000.WAV & 15 & x & x &  & x & x &  &  &  \\
+		& 20200318\_140000.WAV & 10 & x & x &  & x &  &  &  &  \\
+		& 20200301\_180000.WAV & 9 &  & x & x & x &  & x &  &  \\
+		& 20200325\_020000.WAV & 8 & x &  & x & x &  &  &  &  \\ \cmidrule(l){2-11} 
+		\multirow{-6}{*}{\textbf{LOF}} & \multicolumn{2}{c}{\cellcolor[HTML]{EFEFEF}\textbf{RISULTATO \%}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{60}}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{60}}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{40}}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{100}}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{40}}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{40}}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{0}}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}{\color[HTML]{000000} \textbf{0}}} \\ \midrule
+		& 20200323\_180000.WAV & 6 & x & x &  & x & x &  &  &  \\
+		& 20200309\_060000.WAV & 5 & x & x &  & x &  &  &  &  \\
+		& 20200314\_180000.WAV & 4 & x & x &  & x & x & x &  & x \\
+		& 20200328\_140000.WAV & 4 &  &  &  & x & x & x &  &  \\
+		& 20200303\_140000.WAV & 3 &  &  &  &  & x & x &  &  \\ \cmidrule(l){2-11} 
+		\multirow{-6}{*}{\textbf{OCSVM}} & \multicolumn{2}{c}{\cellcolor[HTML]{EFEFEF}\textbf{RISULTATO \%}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{60}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{60}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{0}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{80}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{80}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{80}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{0}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{20}} \\ \midrule
+		& 20200323\_180000.WAV & 43 & x & x &  &  & x &  &  &  \\
+		& 20200303\_140000.WAV & 25 & &  &  &  & x & x &  &  \\
+		& 20200304\_140000.WAV & 21 &  &  &  & x & x & x &  &  \\
+		& 20200311\_140000.WAV & 18 &  &  &  & x & x & x &  &  \\
+		\multirow{-5}{*}{\textbf{TOTAL}} & 20200318\_140000.WAV & 14 & x & x &  & x &  &  &  &  \\ \midrule
+		& \multicolumn{2}{c}{\cellcolor[HTML]{EFEFEF}\textbf{RISULTATO \%}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{40}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{40}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{0}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{80}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{80}} & \multicolumn{1}{c}{\cellcolor[HTML]{EFEFEF}\textbf{60}} & \multicolumn{1}{r}{\cellcolor[HTML]{EFEFEF}\textbf{0}} & \multicolumn{1}{r}{\cellcolor[HTML]{EFEFEF}\textbf{0}} \\ \bottomrule
+	\end{tabular}
+	\caption{Risultati dell'\textit{anomaly detection}. Suddivisi dalla colonna gruppo i risultati dei tre metodi IF, LOF e OCSM, e per ultimo il risultato sull'insieme totale. La seconda colonna descrive il file audio rilevato come anomalia e per ognuno, nella terza colonna, viene specificato il numero di occorrenze rilevate nel gruppo. Il nome dell'audio è composto dalla data (in formato anno con 4 cifre, il mese con 2 cifre e il giorno con 2 cifre), un separatore '\textit{\_}', l'ora (in formato ora 2 cifre e minuti 2 cifre) e infine l'estensione \textit{.WAV}.  Per ogni audio nelle colonne successive sono indicati mediante una \textit{x} le classi di suoni che gli appartengono dei relativi insieme ANT/BIO/GEO e ALTRO per le interferenze I e i suoni sconosciuti S. }
+	\label{fig:51}
+\end{table}

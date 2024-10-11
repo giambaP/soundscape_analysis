@@ -1,0 +1,92 @@
+\chapter{Introduzione}
+In questo capitolo saranno introdotte le nozioni fondamentali per comprendere l’ambito su
+cui si è sviluppato questo studio. Saranno definiti i concetti relativi a \textit{Pattern Recognition} e
+\textit{Machine Learning}, al loro utilizzo nell’analisi di \textit{soundscape}, e in generale nell’analisi di
+audio nel campo dell’ecologia. Nel paragrafo successivo, si andrà ad esplicitare il fine che ha
+suggerito lo sviluppo di questo studio.
+
+% \\ forza a capo manuale
+\section{\textit{Pattern Recognition} e \textit{Machine Learning} \\ per l'analisi di soundscapes e in generale di audio per l'ecologia}
+\textit{Pattern recognition} (PR) e \textit{Machine learning} (ML) [1] rappresentano una branca
+fondamentale dell’intelligenza artificiale, in particolare un insieme di tecniche utilizzate per
+estrarre informazioni dai dati tramite il riconoscimento automatico di specifici schemi,
+definiti \textit{pattern}. In modo approssimato, si può dire che sono equivalenti, poiché condividono
+obiettivi, strumenti e approcci.
+
+Il loro impiego è noto in molteplici ambiti: dal riconoscimento vocale o di immagini,
+all’elaborazione del linguaggio naturale, dai sistemi di raccomandazione, al monitoraggio in
+tempo reale e molti altri [1]. Tra questi emerge un contesto poco analizzato, che in letteratura
+si presenta come una sfida ancora aperta: l’analisi di soundscape. Prima di esaminare nel
+dettaglio come i \textit{soundscape} sono stati affrontati nella PR/ML, per chiarezza, si desidera
+spiegare cosa si intende con tale definizione, le motivazioni per cui merita attenzione e le
+varie problematiche annesse.
+
+Quinn \textit{et al.} identificano i \textit{soundscape} come una “particolare combinazione di suoni in un
+paesaggio” considerandola come “una caratterizzazione ecologica dei paesaggi” [2]. Gli
+autori ritengono che la composizione di un soundscape si divide in quattro elementi
+principali: l’antropofonia (ANT: indica l’attività antropogenica), la biofonia (BIO: intesa
+come le vocalizzazioni della fauna selvatica), la geofonia (GEO: descrive i suoni dei
+fenomeni meteorologici) [2] e infine la quiete (indicata come il suono dell’ambiente).
+
+A tal proposito, è molto interessante la caratterizzazione fornita da Farina \textit{et al. }[3].
+L’argomentazione descritta espone una visione alternativa più mirata e strutturata: separa il
+concetto di \textit{sonoscape} da \textit{soundscape}. Con \textit{sonoscape} intende “il mosaico di tutte le non
+interpretate informazioni sonore all’interno di un landscape” [3]. Da questa definizione si
+deduce per esclusione l’interpretazione che l’autore attribuisce al \textit{soundscape}, ossia “un
+\textit{sonoscape} che è stato cognitivamente interpretato in un mosaico di categorie di ANT, BIO e
+GEO semioticamente interpretate da un organismo” [3]. Un'ulteriore suddivisione separa gli
+elementi in quelle che definisce unità sonore, i \textit{sonotope} per gli \textit{sonoscape}, e i \textit{soundtope} per i
+\textit{soundscape}. I primi vengono definiti dall’autore come una \textit{patch} spazialmente unica di suoni
+non interpretati, mentre i secondi come suoni di ANT, BIO e GEO semioticamente
+interpretati da un organismo [3]. Rispetto ad un’umana suddivisione in ANT/BIO/GEO [3],
+questi concetti appena espressi consentirebbero una classificazione con maggiore dettaglio e
+specificità. Ciononostante, i termini \textit{sonotope} e \textit{soundtope} sono tuttora relegati a mere
+speculazioni a causa di una scarsità di evidenze empiriche [3].
+
+Sebbene la definizione di \textit{soundscape} possa risultare complessa, molto chiara è invece la sua
+importanza. Il ruolo che ricopre nell’ambiente naturale rappresenta un segnale della salute
+dell’ecosistema. Tale segnale può essere utilizzato per studi ecologici [3], diviene un
+significativo approfondimento della biodiversità e dell’impatto umano [2], può evidenziare
+cambiamenti negli habitat dove la qualità acustica è fondamentale per la dimensione vitale e
+il rumore umano risulta deleterio sulla biodiversità [2].
+
+I vantaggi appena descritti supportano e incoraggiano l’analisi degli \textit{soundscape}. PR/ML
+possono dare un grande contributo in tale processo. Sviluppare sistemi automatici mediante
+tecniche di PR/ML permetterebbe di supportare le sfide riguardanti l’analisi dei dati e il
+monitoraggio in tempo reale dell’ecosistema. La classificazione di \textit{soundscape} consente
+l’identificazione automatica di suoni indesiderati su grandi quantità di dati, inoltre permette
+di modellare gli effetti e le interazioni di suoni diversi, e utilizzare poi tali modelli per
+identificare pattern spazio-temporali nell’attività sonora [2]. Introdurre un sistema euristico in
+grado di monitorare la presenza o l’abbondanza di particolari specie potrebbe aiutare la
+gestione di tale specie in una determinata zona, o addirittura evitarne l’estinzione. Allo stesso
+modo, può essere utile per prevenire situazioni di pericolo come il bracconaggio. I dati
+ricavati sarebbero fonte di studio per molti comportamenti animali in specifici periodi
+dell’anno, come il corteggiamento.
+
+Questa innovazione nell’analisi degli \textit{soundscape} non è priva di problematiche. Pochi studi di
+ecoacustica hanno provato a classificare soundscapes utilizzando intere categorie sonore
+come ANT/BIO/GEO e quiete [2]. Tale difficoltà si sviluppa su due elementi. In primo piano,
+l’identificazione manuale delle sorgenti sonore è altamente dispendiosa in termini di tempo
+[2]. Ciò è dovuto all’enorme quantità di dati da visionare manualmente che servono a censire
+un \textit{dataset} di addestramento per i sistemi di PR/ML. Tanto più il \textit{dataset} risulta ampio e
+dettagliato, maggiore sarà la qualità del sistema sviluppato. Oltre al tempo impiegato si
+possono sottintendere anche i costi di tale opera. Il secondo punto riguarda le competenze
+specifiche del settore. Infatti, per censire i dati di addestramento è richiesta una conoscenza
+della vocalizzazione degli animali del contesto, determinando per necessità la scelta di
+sviluppare \textit{dataset} di addestramento di piccole dimensioni [2]. Tali \textit{dataset} non riescono a
+spiegare nel complesso il problema, limitando così la qualità dei sistemi realizzabili.
+
+\section{Obiettivo della tesi: classificazione e analisi preliminare di \textit{anomaly detection}}
+Il seguente studio si propone di studiare approcci di PR/ML per la caratterizzazione di un
+soundscape.
+
+E’ stata implementata una \textit{pipeline} di \textit{Pattern Recognition}. Il segnale audio è stato
+caratterizzato attraverso classiche tecniche d’estrazione delle \textit{features} - o caratteristiche (ad
+esempio features legate al contenuto spettrale, alla forma, o al timbro). Mediante tecniche di
+classificazione si è provato a misurare la capacità discriminativa di queste caratteristiche per
+classificare diverse categorie, come ad esempio il giorno dalla notte oppure la presenza o
+assenza di un temporale.
+
+Sulla base di questo studio, in una fase successiva si è effettuata un'analisi esplorativa
+mediante algoritmi di \textit{anomaly detection }(algoritmi in grado di evidenziare pattern anomali)
+per inferire informazioni e analizzare eventuali singolari pattern emersi.
